@@ -1,55 +1,30 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseUUIDPipe,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { AuthorizationGuard } from 'src/auth/authorization.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'src/util/constants';
+import { AuthUser, CurrentUser } from 'src/auth/current-user';
 
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Post('me')
+  @UseGuards(AuthorizationGuard)
+  create(@CurrentUser() currentUser: AuthUser) {
+    return this.usersService.createUser({ authUserId: currentUser.sub });
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
+  @UseGuards(AuthorizationGuard)
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  update(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.usersService.remove(+id);
+  @Get('me')
+  @UseGuards(AuthorizationGuard)
+  findOne(@CurrentUser() currentUser: AuthUser) {
+    return this.usersService.findUserByAuthUserId(currentUser.sub);
   }
 }

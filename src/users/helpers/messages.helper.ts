@@ -1,8 +1,5 @@
-const PASSWORD_VALID =
-  'The password must have uppercase & lowercase letters, numbers, and special characters';
-const PASSWORD_INVALID = 'Email and/or password invalid';
+const USER_EXISTS = 'User already exists';
 
 export const MessagesHelper = {
-  PASSWORD_VALID,
-  PASSWORD_INVALID,
+  USER_EXISTS,
 };

@@ -11,10 +11,9 @@ datasource db {
 }
 
 model Users {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  name          String
-  password      String
+  id         String @id @default(uuid())
+  authUserId String @unique
+
   lastLoginDate DateTime?
 
   createdAt DateTime @default(now())
