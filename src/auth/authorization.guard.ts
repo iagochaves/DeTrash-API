@@ -52,7 +52,6 @@ export class AuthorizationGuard implements CanActivate {
       );
 
       const scopeRules = req?.auth.permissions as string[];
-      console.log('req', req.auth);
       if (requiredRoles) {
         if (!scopeRules?.length) return false;
 

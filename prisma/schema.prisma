@@ -10,11 +10,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+enum ProfileType {
+  recycler
+  waste_generator
+  hodler
+}
+
+model User {
   id         String @id @default(uuid())
   authUserId String @unique
 
+  profileType   ProfileType?
   lastLoginDate DateTime?
+
+  forms Form[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Form {
+  formId String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  recyclerVideoFileName String?
+
+  plasticKgs Decimal?
+  paperKgs   Decimal?
+  metalKgs   Decimal?
+  glassKgs   Decimal?
+  organicKgs Decimal?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

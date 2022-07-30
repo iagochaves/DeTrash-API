@@ -12,7 +12,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async updateLastLogin(authUserId: string) {
-    await this.prisma.users.update({
+    await this.prisma.user.update({
       where: {
         authUserId,
       },
@@ -23,7 +23,7 @@ export class UsersService {
   }
 
   async createUser({ authUserId }: CreateUserDto) {
-    const userExists = await this.prisma.users.findUnique({
+    const userExists = await this.prisma.user.findUnique({
       where: {
         authUserId,
       },
@@ -33,7 +33,7 @@ export class UsersService {
       throw new ForbiddenException(MessagesHelper.USER_EXISTS);
     }
 
-    const user = await this.prisma.users.create({
+    const user = await this.prisma.user.create({
       data: {
         authUserId,
       },
@@ -43,17 +43,17 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.users.findMany();
+    return this.prisma.user.findMany();
   }
 
   async findUserByAuthUserId(authUserId: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         authUserId,
       },
     });
 
-    if (!user) throw new NotFoundException();
+    if (!user) throw new NotFoundException(MessagesHelper.USER_NOT_FOUND);
 
     await this.updateLastLogin(authUserId);
 
