@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
-import { UsersService } from 'src/users/users.service';
-import { CreateFormDto } from '../dto/create-form.dto';
-import { IS3CreateResponseData } from '../dto/s3.dto';
+import { IS3CreateResponseData } from 'src/http/dto/s3.dto';
+import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
 import { S3Service } from './s3.service';
+import { UsersService } from './users.service';
 
 @Injectable()
 export class FormsService {
@@ -19,12 +19,13 @@ export class FormsService {
   //   });
   // }
 
-  async createForm(
-    { fileName, ...materialType }: CreateFormDto,
-    authUserId: string,
-  ) {
+  listAllForms() {
+    return this.prismaService.form.findMany();
+  }
+
+  async createForm({ authUserId, fileName, ...materialType }: CreateFormInput) {
     const user = await this.usersService.findUserByAuthUserId(authUserId);
-    const formData = {} as CreateFormDto;
+    const formData = {} as CreateFormInput;
     let responseData = {} as IS3CreateResponseData;
 
     const filteredMaterial = Object.entries(materialType).filter(
@@ -36,7 +37,7 @@ export class FormsService {
     if (fileName) {
       const s3Data = await this.s3Service.createPreSignedObjectUrl(fileName);
 
-      Object.assign(formData, { recyclerVideoFileName: s3Data.name });
+      Object.assign(formData, { recyclerVideoFileName: s3Data.fileName });
       responseData = s3Data;
     }
 
@@ -46,10 +47,17 @@ export class FormsService {
         userId: user.id,
       },
     });
-
     return {
       form,
       s3: responseData,
     };
+  }
+
+  async listAllFromUserByUserId(userId: string) {
+    return this.prismaService.form.findMany({
+      where: {
+        userId,
+      },
+    });
   }
 }

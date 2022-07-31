@@ -1,0 +1,95 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+directive @key(fields: String!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
+
+directive @extends on OBJECT | INTERFACE
+
+directive @external on OBJECT | FIELD_DEFINITION
+
+directive @requires(fields: String!) on FIELD_DEFINITION
+
+directive @provides(fields: String!) on FIELD_DEFINITION
+
+directive @shareable on FIELD_DEFINITION | OBJECT
+
+directive @link(url: String!, import: [link__Import]) on SCHEMA
+
+directive @tag(name: String!) repeatable on FIELD_DEFINITION | OBJECT | INTERFACE | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @inaccessible on FIELD_DEFINITION | OBJECT | INTERFACE | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @override(from: String!) on FIELD_DEFINITION
+
+type User {
+  """Auth0 User ID"""
+  authUserId: ID!
+  profileType: ProfileType!
+  lastLoginDate: DateTime
+  forms: [Form!]!
+  createdAt: DateTime!
+}
+
+"""Represents the user type"""
+enum ProfileType {
+  HODLER
+  RECYCLER
+  WASTE_GENERATOR
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Form {
+  formId: ID!
+  recyclerVideoFileName: String
+  plasticKgs: Float
+  paperKgs: Float
+  metalKgs: Float
+  glassKgs: Float
+  organicKgs: Float
+  user: User!
+  createdAt: DateTime!
+}
+
+type S3 {
+  createUrl: String!
+  fileName: String!
+}
+
+type CreateFormResponse {
+  form: Form!
+
+  """Field regarding informations on AWS S3"""
+  s3: S3
+}
+
+type Query {
+  me: User!
+  user(userAuthId: String!): User!
+  users: [User!]!
+  forms: [Form!]!
+}
+
+type Mutation {
+  createUser(data: CreateUserInput!): User!
+  createForm(data: CreateFormInput!): CreateFormResponse!
+}
+
+input CreateUserInput {
+  profileType: ProfileType!
+}
+
+input CreateFormInput {
+  fileName: String
+  plasticKgs: Float
+  paperKgs: Float
+  metalKgs: Float
+  glassKgs: Float
+  organicKgs: Float
+}
+
+scalar link__Import

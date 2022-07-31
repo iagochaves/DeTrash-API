@@ -1,18 +1,18 @@
 import {
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { MessagesHelper } from './helpers/messages.helper';
+import { MessagesHelper } from 'src/helpers/messages.helper';
+import { CreateUserInput } from 'src/http/graphql/inputs/create-user-input';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async updateLastLogin(authUserId: string) {
-    await this.prisma.user.update({
+  updateLastLogin(authUserId: string) {
+    this.prisma.user.update({
       where: {
         authUserId,
       },
@@ -22,7 +22,7 @@ export class UsersService {
     });
   }
 
-  async createUser({ authUserId }: CreateUserDto) {
+  async createUser({ authUserId, profileType }: CreateUserInput) {
     const userExists = await this.prisma.user.findUnique({
       where: {
         authUserId,
@@ -30,12 +30,13 @@ export class UsersService {
     });
 
     if (userExists) {
-      throw new ForbiddenException(MessagesHelper.USER_EXISTS);
+      throw new BadRequestException(MessagesHelper.USER_EXISTS);
     }
 
     const user = await this.prisma.user.create({
       data: {
         authUserId,
+        profileType,
       },
     });
 
@@ -55,7 +56,19 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(MessagesHelper.USER_NOT_FOUND);
 
-    await this.updateLastLogin(authUserId);
+    this.updateLastLogin(authUserId);
+
+    return user;
+  }
+
+  async findUserByUserId(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) throw new NotFoundException(MessagesHelper.USER_NOT_FOUND);
 
     return user;
   }

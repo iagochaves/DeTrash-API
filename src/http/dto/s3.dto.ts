@@ -5,5 +5,5 @@ export interface IS3Service {
 
 export interface IS3CreateResponseData {
   createUrl: string;
-  name: string;
+  fileName: string;
 }
