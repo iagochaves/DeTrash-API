@@ -49,7 +49,7 @@ export class FormsService {
   async createForm({ authUserId, fileName, ...materialType }: CreateFormInput) {
     const user = await this.usersService.findUserByAuthUserId(authUserId);
 
-    if (user.profileType !== 'RECYCLER') {
+    if (user.profileType !== 'RECYCLER' && fileName) {
       throw new ForbiddenException(MessagesHelper.USER_NOT_RECYCLER);
     }
     const formData = {} as CreateFormInput;

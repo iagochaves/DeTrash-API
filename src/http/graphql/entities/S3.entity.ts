@@ -2,9 +2,9 @@ import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class S3 {
-  @Field()
+  @Field({ nullable: true })
   createUrl: string;
 
-  @Field()
+  @Field({ nullable: true })
   fileName: string;
 }

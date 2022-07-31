@@ -56,8 +56,8 @@ type Form {
 }
 
 type S3 {
-  createUrl: String!
-  fileName: String!
+  createUrl: String
+  fileName: String
 }
 
 type CreateFormResponse {
