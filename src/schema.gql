@@ -67,11 +67,17 @@ type CreateFormResponse {
   s3: S3
 }
 
+type FormVideoUrl {
+  formVideoUrl: String!
+}
+
 type Query {
   me: User!
   user(userAuthId: String!): User!
   users: [User!]!
   forms: [Form!]!
+  form(formId: String!): Form!
+  formVideoUrl(formId: String!): FormVideoUrl!
 }
 
 type Mutation {

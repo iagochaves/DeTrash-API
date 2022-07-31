@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { IS3CreateResponseData } from 'src/http/dto/s3.dto';
@@ -13,6 +18,29 @@ export class FormsService {
     private readonly s3Service: S3Service,
     private readonly usersService: UsersService,
   ) {}
+
+  async getFormVideoUrl(formId: string) {
+    const { recyclerVideoFileName } = await this.findByFormId(formId);
+
+    if (!recyclerVideoFileName)
+      throw new BadRequestException(MessagesHelper.FORM_DOES_NOT_HAVE_VIDEO);
+
+    return {
+      formVideoUrl: this.s3Service.getPreSignedObjectUrl(recyclerVideoFileName),
+    };
+  }
+
+  async findByFormId(formId: string) {
+    const form = await this.prismaService.form.findUnique({
+      where: {
+        formId,
+      },
+    });
+
+    if (!form) throw new NotFoundException(MessagesHelper.FORM_NOT_FOUND);
+
+    return form;
+  }
 
   listAllForms() {
     return this.prismaService.form.findMany();

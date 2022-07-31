@@ -16,6 +16,7 @@ import { Role } from 'src/util/constants';
 import { Form } from '../entities/form.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
 import { CreateFormResponse } from '../responses/create-form-response';
+import { FormVideoUrl } from '../responses/get-form-video-response';
 
 @Resolver(() => Form)
 export class FormsResolver {
@@ -34,6 +35,18 @@ export class FormsResolver {
   @ResolveField()
   user(@Parent() form: Form) {
     return this.usersService.findUserByUserId(form.userId);
+  }
+
+  @Query(() => Form)
+  @UseGuards(AuthorizationGuard)
+  async form(@Args('formId') formId: string) {
+    return this.formsService.findByFormId(formId);
+  }
+
+  @Query(() => FormVideoUrl)
+  @UseGuards(AuthorizationGuard)
+  formVideoUrl(@Args('formId') formId: string) {
+    return this.formsService.getFormVideoUrl(formId);
   }
 
   @Mutation(() => CreateFormResponse)
