@@ -1,4 +1,3 @@
-import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -7,7 +6,6 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { AuthorizationGuard } from 'src/http/auth/authorization.guard';
 import { AuthUser, CurrentUser } from 'src/http/auth/current-user';
 import { Roles } from 'src/http/auth/roles.decorator';
 import { FormsService } from 'src/services/forms.service';
@@ -26,21 +24,18 @@ export class UsersResolver {
   ) {}
 
   @Query(() => User)
-  @UseGuards(AuthorizationGuard)
   me(@CurrentUser() user: AuthUser) {
     return this.usersService.findUserByAuthUserId(user.sub);
   }
 
   @Query(() => User)
   @Roles(Role.Admin)
-  @UseGuards(AuthorizationGuard)
   user(@Args('userAuthId') authUserId: string) {
     return this.usersService.findUserByAuthUserId(authUserId);
   }
 
   @Query(() => [User])
   @Roles(Role.Admin)
-  @UseGuards(AuthorizationGuard)
   users() {
     return this.usersService.findAll();
   }
@@ -51,7 +46,6 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  @UseGuards(AuthorizationGuard)
   createUser(
     @Args('data') data: CreateUserInput,
     @CurrentUser() user: AuthUser,
@@ -60,7 +54,6 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  @UseGuards(AuthorizationGuard)
   updateUser(
     @Args('data') data: UpdateUserInput,
     @CurrentUser() user: AuthUser,

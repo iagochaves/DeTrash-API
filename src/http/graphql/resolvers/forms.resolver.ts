@@ -1,4 +1,3 @@
-import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -7,7 +6,6 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { AuthorizationGuard } from 'src/http/auth/authorization.guard';
 import { AuthUser, CurrentUser } from 'src/http/auth/current-user';
 import { Roles } from 'src/http/auth/roles.decorator';
 import { FormsService } from 'src/services/forms.service';
@@ -27,7 +25,6 @@ export class FormsResolver {
 
   @Query(() => [Form])
   @Roles(Role.Admin)
-  @UseGuards(AuthorizationGuard)
   async forms() {
     return this.formsService.listAllForms();
   }
@@ -38,19 +35,16 @@ export class FormsResolver {
   }
 
   @Query(() => Form)
-  @UseGuards(AuthorizationGuard)
   async form(@Args('formId') formId: string) {
     return this.formsService.findByFormId(formId);
   }
 
   @Query(() => FormVideoUrl)
-  @UseGuards(AuthorizationGuard)
   formVideoUrl(@Args('formId') formId: string) {
     return this.formsService.getFormVideoUrl(formId);
   }
 
   @Mutation(() => CreateFormResponse)
-  @UseGuards(AuthorizationGuard)
   createForm(
     @Args('data') data: CreateFormInput,
     @CurrentUser() user: AuthUser,
