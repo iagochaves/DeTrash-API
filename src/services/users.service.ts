@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { CreateUserInput } from 'src/http/graphql/inputs/create-user-input';
+import { UpdateUserInput } from 'src/http/graphql/inputs/update-user-input';
 
 @Injectable()
 export class UsersService {
@@ -41,6 +42,23 @@ export class UsersService {
     });
 
     return user;
+  }
+
+  async updateUser({ authUserId, profileType }: UpdateUserInput) {
+    const currentUser = await this.findUserByAuthUserId(authUserId);
+
+    if (profileType) {
+      return this.prisma.user.update({
+        where: {
+          authUserId,
+        },
+        data: {
+          profileType,
+        },
+      });
+    }
+
+    return currentUser;
   }
 
   findAll() {

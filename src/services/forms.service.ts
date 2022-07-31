@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
+import { MessagesHelper } from 'src/helpers/messages.helper';
 import { IS3CreateResponseData } from 'src/http/dto/s3.dto';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
 import { S3Service } from './s3.service';
@@ -13,18 +14,16 @@ export class FormsService {
     private readonly usersService: UsersService,
   ) {}
 
-  // RecyclerUser(authUserId: string) {
-  //   return this.prismaService.user.findUnique({
-  //     where: { profileType: '' },
-  //   });
-  // }
-
   listAllForms() {
     return this.prismaService.form.findMany();
   }
 
   async createForm({ authUserId, fileName, ...materialType }: CreateFormInput) {
     const user = await this.usersService.findUserByAuthUserId(authUserId);
+
+    if (user.profileType !== 'RECYCLER') {
+      throw new ForbiddenException(MessagesHelper.USER_NOT_RECYCLER);
+    }
     const formData = {} as CreateFormInput;
     let responseData = {} as IS3CreateResponseData;
 

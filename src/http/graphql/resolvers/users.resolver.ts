@@ -16,6 +16,7 @@ import { Role } from 'src/util/constants';
 import { CreateUserInput } from '../inputs/create-user-input';
 import { User } from '../entities/user.entity';
 import { Form } from '../entities/form.entity';
+import { UpdateUserInput } from '../inputs/update-user-input';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -56,5 +57,14 @@ export class UsersResolver {
     @CurrentUser() user: AuthUser,
   ) {
     return this.usersService.createUser({ authUserId: user.sub, ...data });
+  }
+
+  @Mutation(() => User)
+  @UseGuards(AuthorizationGuard)
+  updateUser(
+    @Args('data') data: UpdateUserInput,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.usersService.updateUser({ authUserId: user.sub, ...data });
   }
 }

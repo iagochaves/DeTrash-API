@@ -76,11 +76,16 @@ type Query {
 
 type Mutation {
   createUser(data: CreateUserInput!): User!
+  updateUser(data: UpdateUserInput!): User!
   createForm(data: CreateFormInput!): CreateFormResponse!
 }
 
 input CreateUserInput {
   profileType: ProfileType!
+}
+
+input UpdateUserInput {
+  profileType: ProfileType
 }
 
 input CreateFormInput {
