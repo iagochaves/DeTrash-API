@@ -7,4 +7,7 @@ export class CreateUserInput {
 
   @Field(() => ProfileType)
   profileType: ProfileType;
+
+  @Field()
+  phoneNumber: string;
 }

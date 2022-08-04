@@ -22,6 +22,7 @@ model User {
 
   profileType   ProfileType
   lastLoginDate DateTime?
+  phoneNumber   String
 
   forms Form[]
 

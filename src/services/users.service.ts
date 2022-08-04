@@ -23,7 +23,7 @@ export class UsersService {
     });
   }
 
-  async createUser({ authUserId, profileType }: CreateUserInput) {
+  async createUser({ authUserId, ...userInfo }: CreateUserInput) {
     const userExists = await this.prisma.user.findUnique({
       where: {
         authUserId,
@@ -37,7 +37,7 @@ export class UsersService {
     const user = await this.prisma.user.create({
       data: {
         authUserId,
-        profileType,
+        ...userInfo,
       },
     });
 

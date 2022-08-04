@@ -1,4 +1,4 @@
-import { ObjectType, Field, registerEnumType, ID } from '@nestjs/graphql';
+import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Form } from './form.entity';
 
 export enum ProfileType {
@@ -24,6 +24,9 @@ export class User {
 
   @Field(() => Date, { nullable: true })
   lastLoginDate: Date;
+
+  @Field()
+  phoneNumber: string;
 
   @Field(() => [Form])
   forms: Form[];
