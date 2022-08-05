@@ -72,8 +72,23 @@ type FormVideoUrl {
   formVideoUrl: String!
 }
 
+type Permissions {
+  type: String!
+}
+
+type Me {
+  """Auth0 User ID"""
+  authUserId: ID!
+  profileType: ProfileType!
+  lastLoginDate: DateTime
+  phoneNumber: String!
+  forms: [Form!]!
+  createdAt: DateTime!
+  permissions: [Permissions!]!
+}
+
 type Query {
-  me: User!
+  me: Me!
   user(userAuthId: String!): User!
   users: [User!]!
   forms: [Form!]!

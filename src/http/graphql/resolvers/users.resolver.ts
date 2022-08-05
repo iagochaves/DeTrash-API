@@ -11,10 +11,11 @@ import { Roles } from 'src/http/auth/roles.decorator';
 import { FormsService } from 'src/services/forms.service';
 import { UsersService } from 'src/services/users.service';
 import { Role } from 'src/util/constants';
-import { CreateUserInput } from '../inputs/create-user-input';
-import { User } from '../entities/user.entity';
 import { Form } from '../entities/form.entity';
+import { User } from '../entities/user.entity';
+import { CreateUserInput } from '../inputs/create-user-input';
 import { UpdateUserInput } from '../inputs/update-user-input';
+import { Me } from '../responses/get-me-response';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -23,9 +24,20 @@ export class UsersResolver {
     private formsService: FormsService,
   ) {}
 
-  @Query(() => User)
-  me(@CurrentUser() user: AuthUser) {
-    return this.usersService.findUserByAuthUserId(user.sub);
+  @Query(() => Me)
+  async me(@CurrentUser() user: AuthUser) {
+    const userData = await this.usersService.findUserByAuthUserId(user.sub);
+
+    const permissions = user?.permissions?.length
+      ? user.permissions.map((permissionType) => ({
+          type: permissionType,
+        }))
+      : [];
+
+    return {
+      permissions,
+      ...userData,
+    };
   }
 
   @Query(() => User)
