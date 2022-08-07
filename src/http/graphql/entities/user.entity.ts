@@ -26,6 +26,9 @@ export class User {
   lastLoginDate: Date;
 
   @Field()
+  email: string;
+
+  @Field()
   phoneNumber: string;
 
   @Field(() => [Form])

@@ -27,6 +27,7 @@ type User {
   authUserId: ID!
   profileType: ProfileType!
   lastLoginDate: DateTime
+  email: String!
   phoneNumber: String!
   forms: [Form!]!
   createdAt: DateTime!
@@ -81,6 +82,7 @@ type Me {
   authUserId: ID!
   profileType: ProfileType!
   lastLoginDate: DateTime
+  email: String!
   phoneNumber: String!
   forms: [Form!]!
   createdAt: DateTime!
@@ -105,11 +107,13 @@ type Mutation {
 input CreateUserInput {
   profileType: ProfileType!
   phoneNumber: String!
+  email: String!
 }
 
 input UpdateUserInput {
   profileType: ProfileType
   phoneNumber: String
+  email: String
 }
 
 input CreateFormInput {

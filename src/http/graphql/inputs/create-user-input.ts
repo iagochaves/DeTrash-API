@@ -10,4 +10,7 @@ export class CreateUserInput {
 
   @Field()
   phoneNumber: string;
+
+  @Field()
+  email: string;
 }

@@ -20,6 +20,7 @@ model User {
   id         String @id @default(uuid())
   authUserId String @unique
 
+  email         String
   profileType   ProfileType
   lastLoginDate DateTime?
   phoneNumber   String
