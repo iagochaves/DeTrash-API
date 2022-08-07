@@ -13,7 +13,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   updateLastLogin(authUserId: string) {
-    this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         authUserId,
       },
@@ -74,8 +74,7 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(MessagesHelper.USER_NOT_FOUND);
 
-    this.updateLastLogin(authUserId);
-
+    await this.updateLastLogin(authUserId);
     return user;
   }
 
