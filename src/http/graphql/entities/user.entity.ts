@@ -14,9 +14,10 @@ registerEnumType(ProfileType, {
 
 @ObjectType()
 export class User {
+  @Field(() => ID)
   id: string;
 
-  @Field(() => ID, { description: 'Auth0 User ID' })
+  @Field({ description: 'Auth0 User ID' })
   authUserId: string;
 
   @Field(() => ProfileType)

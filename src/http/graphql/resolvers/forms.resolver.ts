@@ -11,10 +11,10 @@ import { Roles } from 'src/http/auth/roles.decorator';
 import { FormsService } from 'src/services/forms.service';
 import { UsersService } from 'src/services/users.service';
 import { Role } from 'src/util/constants';
-import { Form } from '../entities/form.entity';
+import { Form, ResidueType } from '../entities/form.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
+import { AggregateFormByUserProfileResponse } from '../responses/aggregate-form-by-user-profile-response';
 import { CreateFormResponse } from '../responses/create-form-response';
-import { FormVideoUrl } from '../responses/get-form-video-response';
 
 @Resolver(() => Form)
 export class FormsResolver {
@@ -34,14 +34,22 @@ export class FormsResolver {
     return this.usersService.findUserByUserId(form.userId);
   }
 
+  @Query(() => [AggregateFormByUserProfileResponse])
+  aggregateFormByUserProfile() {
+    return this.formsService.listFormDetails();
+  }
+
   @Query(() => Form)
   async form(@Args('formId') formId: string) {
     return this.formsService.findByFormId(formId);
   }
 
-  @Query(() => FormVideoUrl)
-  formVideoUrl(@Args('formId') formId: string) {
-    return this.formsService.getFormVideoUrl(formId);
+  @Query(() => String)
+  formVideoUrlByResidue(
+    @Args('formId') formId: string,
+    @Args('residueType', { type: () => ResidueType }) residueType: ResidueType,
+  ) {
+    return this.formsService.getFormVideoUrl(formId, residueType);
   }
 
   @Mutation(() => CreateFormResponse)

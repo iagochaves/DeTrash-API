@@ -1,4 +1,5 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { ResidueType } from './form.entity';
 
 @ObjectType()
 export class S3 {
@@ -7,4 +8,7 @@ export class S3 {
 
   @Field({ nullable: true })
   fileName: string;
+
+  @Field(() => ResidueType, { nullable: true })
+  residue: ResidueType;
 }

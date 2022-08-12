@@ -32,18 +32,25 @@ model User {
 }
 
 model Form {
-  formId String @id @default(uuid())
+  id String @id @default(uuid())
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  recyclerVideoFileName String?
+  plasticKgs           Decimal? @default(0)
+  plasticVideoFileName String?
 
-  plasticKgs Decimal?
-  paperKgs   Decimal?
-  metalKgs   Decimal?
-  glassKgs   Decimal?
-  organicKgs Decimal?
+  paperKgs           Decimal? @default(0)
+  paperVideoFileName String?
+
+  metalKgs           Decimal? @default(0)
+  metalVideoFileName String?
+
+  glassKgs           Decimal? @default(0)
+  glassVideoFileName String?
+
+  organicKgs           Decimal? @default(0)
+  organicVideoFileName String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

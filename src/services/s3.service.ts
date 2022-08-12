@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
-  S3Client as S3AWSClient,
   GetObjectCommand,
   PutObjectCommand,
+  S3Client as S3AWSClient,
 } from '@aws-sdk/client-s3';
-import { randomBytes } from 'crypto';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { randomBytes } from 'crypto';
 import { IS3CreateResponseData, IS3Service } from 'src/http/dto/s3.dto';
 
 @Injectable()
@@ -43,10 +43,11 @@ export class S3Service implements IS3Service {
 
   async createPreSignedObjectUrl(
     fileName: string,
+    residueType: string,
   ): Promise<IS3CreateResponseData> {
     const hash = randomBytes(16);
 
-    const hashedFileName = `${hash.toString('hex')}-${fileName}`;
+    const hashedFileName = `${hash.toString('hex')}-${residueType}-${fileName}`;
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: this.configService.get('BUCKET_NAME') ?? '',
