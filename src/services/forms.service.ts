@@ -8,7 +8,7 @@ import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { ResidueType } from 'src/http/graphql/entities/form.entity';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
-import { RESIDUES_FIELD_BY_TYPE } from 'src/util/constants';
+import { RESIDUES_FIELDS_BY_TYPE } from 'src/util/constants';
 import { S3Service } from './s3.service';
 import { UsersService } from './users.service';
 
@@ -23,12 +23,13 @@ export class FormsService {
   async getFormVideoUrl(formId: string, residueType: ResidueType) {
     const formData = await this.findByFormId(formId);
 
-    const residueField = RESIDUES_FIELD_BY_TYPE[residueType];
+    const residueVideoField =
+      RESIDUES_FIELDS_BY_TYPE[residueType].videoFileNameField;
 
-    if (!formData[residueField])
+    if (!formData[residueVideoField])
       throw new BadRequestException(MessagesHelper.FORM_DOES_NOT_HAVE_VIDEO);
 
-    return this.s3Service.getPreSignedObjectUrl(formData[residueField]);
+    return this.s3Service.getPreSignedObjectUrl(formData[residueVideoField]);
   }
 
   async findByFormId(id: string) {
@@ -98,71 +99,44 @@ export class FormsService {
   async createForm({ authUserId, ...restFormData }: CreateFormInput) {
     const user = await this.usersService.findUserByAuthUserId(authUserId);
 
-    const {
-      glassVideoFileName,
-      metalVideoFileName,
-      paperVideoFileName,
-      organicVideoFileName,
-      plasticVideoFileName,
-      ...materialType
-    } = restFormData;
+    const hasUploadedVideo = Object.entries(restFormData).some(
+      ([, residueProps]) => residueProps?.videoFileName,
+    );
 
-    const residuesVideos = [
-      {
-        key: ResidueType.GLASS,
-        fileName: glassVideoFileName,
-        field: 'glassVideoFileName',
-      },
-      {
-        key: ResidueType.METAL,
-        fileName: metalVideoFileName,
-        field: 'metalVideoFileName',
-      },
-      {
-        key: ResidueType.PAPER,
-        fileName: paperVideoFileName,
-        field: 'paperVideoFileName',
-      },
-      {
-        key: ResidueType.ORGANIC,
-        fileName: organicVideoFileName,
-        field: 'organicVideoFileName',
-      },
-      {
-        key: ResidueType.PLASTIC,
-        fileName: plasticVideoFileName,
-        field: 'plasticVideoFileName',
-      },
-    ].filter((residues) => Boolean(residues.fileName));
-
-    if (user.profileType !== 'RECYCLER' && residuesVideos.length) {
+    if (user.profileType !== 'RECYCLER' && hasUploadedVideo) {
       throw new ForbiddenException(MessagesHelper.USER_NOT_RECYCLER);
     }
     const formData = {} as CreateFormInput;
     let responseData = [];
 
-    const filteredMaterial = Object.entries(materialType).filter(
-      ([, materialValue]) => Boolean(materialValue),
-    );
-
-    Object.assign(formData, Object.fromEntries(filteredMaterial));
-
-    if (residuesVideos.length) {
-      const s3Data = await residuesVideos.reduce(
-        async (asyncAllVideos, { key, fileName, field }) => {
+    if (hasUploadedVideo) {
+      const s3Data = await Object.entries(restFormData).reduce(
+        async (asyncAllVideos, [residueType, residueProps]) => {
           const allVideos = await asyncAllVideos;
 
           const { fileName: s3FileName, createUrl } =
-            await this.s3Service.createPreSignedObjectUrl(fileName, key);
+            await this.s3Service.createPreSignedObjectUrl(
+              residueProps.videoFileName,
+              residueType,
+            );
 
-          Object.assign(formData, { [field]: s3FileName });
+          const databaseResidueVideoField =
+            RESIDUES_FIELDS_BY_TYPE[residueType].videoFileNameField;
+
+          const databaseResidueAmountField =
+            RESIDUES_FIELDS_BY_TYPE[residueType].amountField;
+
+          Object.assign(formData, {
+            [databaseResidueVideoField]: s3FileName,
+            [databaseResidueAmountField]: residueProps.amount,
+          });
 
           return [
             ...allVideos,
             {
               fileName: s3FileName,
               createUrl,
-              residue: key,
+              residue: residueType,
             },
           ];
         },

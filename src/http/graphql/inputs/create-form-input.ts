@@ -1,36 +1,31 @@
 import { Field, Float, InputType } from '@nestjs/graphql';
+import { ResidueType } from '../entities/form.entity';
+
+@InputType()
+class ResidueInput {
+  @Field(() => Float, { nullable: true })
+  amount: number;
+
+  @Field({ nullable: true })
+  videoFileName?: string;
+}
 
 @InputType()
 export class CreateFormInput {
   authUserId: string;
 
-  @Field(() => Float, { nullable: true })
-  plasticKgs?: number;
+  @Field(() => ResidueInput, { nullable: true })
+  [ResidueType.GLASS]?: ResidueInput;
 
-  @Field({ nullable: true })
-  plasticVideoFileName: string;
+  @Field(() => ResidueInput, { nullable: true })
+  [ResidueType.METAL]?: ResidueInput;
 
-  @Field(() => Float, { nullable: true })
-  paperKgs?: number;
+  @Field(() => ResidueInput, { nullable: true })
+  [ResidueType.ORGANIC]?: ResidueInput;
 
-  @Field({ nullable: true })
-  paperVideoFileName: string;
+  @Field(() => ResidueInput, { nullable: true })
+  [ResidueType.PAPER]?: ResidueInput;
 
-  @Field(() => Float, { nullable: true })
-  metalKgs?: number;
-
-  @Field({ nullable: true })
-  metalVideoFileName: string;
-
-  @Field(() => Float, { nullable: true })
-  glassKgs?: number;
-
-  @Field({ nullable: true })
-  glassVideoFileName: string;
-
-  @Field(() => Float, { nullable: true })
-  organicKgs?: number;
-
-  @Field({ nullable: true })
-  organicVideoFileName: string;
+  @Field(() => ResidueInput, { nullable: true })
+  [ResidueType.PLASTIC]?: ResidueInput;
 }

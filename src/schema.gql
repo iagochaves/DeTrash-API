@@ -145,16 +145,16 @@ input UpdateUserInput {
 }
 
 input CreateFormInput {
-  plasticKgs: Float
-  plasticVideoFileName: String
-  paperKgs: Float
-  paperVideoFileName: String
-  metalKgs: Float
-  metalVideoFileName: String
-  glassKgs: Float
-  glassVideoFileName: String
-  organicKgs: Float
-  organicVideoFileName: String
+  GLASS: ResidueInput
+  METAL: ResidueInput
+  ORGANIC: ResidueInput
+  PAPER: ResidueInput
+  PLASTIC: ResidueInput
+}
+
+input ResidueInput {
+  amount: Float
+  videoFileName: String
 }
 
 scalar link__Import

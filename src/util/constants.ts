@@ -12,10 +12,25 @@ export const PERMISSION_SCOPES = {
 
 export const ALLOWED_MIMES = ['video/mp4', 'video/webm'];
 
-export const RESIDUES_FIELD_BY_TYPE = {
-  [ResidueType.GLASS]: 'glassVideoFileName',
-  [ResidueType.METAL]: 'metalVideoFileName',
-  [ResidueType.PAPER]: 'paperVideoFileName',
-  [ResidueType.ORGANIC]: 'organicVideoFileName',
-  [ResidueType.PLASTIC]: 'plasticVideoFileName',
+export const RESIDUES_FIELDS_BY_TYPE = {
+  [ResidueType.GLASS]: {
+    amountField: 'glassKgs',
+    videoFileNameField: 'glassVideoFileName',
+  },
+  [ResidueType.METAL]: {
+    amountField: 'metalKgs',
+    videoFileNameField: 'metalVideoFileName',
+  },
+  [ResidueType.PAPER]: {
+    amountField: 'paperKgs',
+    videoFileNameField: 'paperVideoFileName',
+  },
+  [ResidueType.ORGANIC]: {
+    amountField: 'organicKgs',
+    videoFileNameField: 'organicVideoFileName',
+  },
+  [ResidueType.PLASTIC]: {
+    amountField: 'plasticKgs',
+    videoFileNameField: 'plasticVideoFileName',
+  },
 };
