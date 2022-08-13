@@ -20,6 +20,9 @@ export class User {
   @Field({ description: 'Auth0 User ID' })
   authUserId: string;
 
+  @Field()
+  name: string;
+
   @Field(() => ProfileType)
   profileType: ProfileType;
 

@@ -5,6 +5,9 @@ import { ProfileType } from '../entities/user.entity';
 export class CreateUserInput {
   authUserId: string;
 
+  @Field()
+  name: string;
+
   @Field(() => ProfileType)
   profileType: ProfileType;
 

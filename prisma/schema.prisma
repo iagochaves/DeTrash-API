@@ -20,6 +20,7 @@ model User {
   id         String @id @default(uuid())
   authUserId String @unique
 
+  name          String
   email         String
   profileType   ProfileType
   lastLoginDate DateTime?
@@ -35,7 +36,7 @@ model Form {
   id String @id @default(uuid())
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   plasticKgs           Decimal @default(0)
   plasticVideoFileName String?

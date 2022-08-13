@@ -27,6 +27,7 @@ type User {
 
   """Auth0 User ID"""
   authUserId: String!
+  name: String!
   profileType: ProfileType!
   lastLoginDate: DateTime
   email: String!
@@ -107,6 +108,7 @@ type Me {
 
   """Auth0 User ID"""
   authUserId: String!
+  name: String!
   profileType: ProfileType!
   lastLoginDate: DateTime
   email: String!
@@ -133,12 +135,14 @@ type Mutation {
 }
 
 input CreateUserInput {
+  name: String!
   profileType: ProfileType!
   phoneNumber: String!
   email: String!
 }
 
 input UpdateUserInput {
+  name: String
   profileType: ProfileType
   phoneNumber: String
   email: String
