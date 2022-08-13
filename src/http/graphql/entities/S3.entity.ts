@@ -3,12 +3,12 @@ import { ResidueType } from './form.entity';
 
 @ObjectType()
 export class S3 {
-  @Field({ nullable: true })
+  @Field()
   createUrl: string;
 
-  @Field({ nullable: true })
+  @Field()
   fileName: string;
 
-  @Field(() => ResidueType, { nullable: true })
+  @Field(() => ResidueType)
   residue: ResidueType;
 }

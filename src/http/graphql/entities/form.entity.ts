@@ -25,32 +25,32 @@ export class Form {
   @Field(() => ID)
   id: string;
 
-  @Field(() => Float, { nullable: true })
-  plasticKgs?: number;
+  @Field(() => Float)
+  plasticKgs: number;
 
   @Field({ nullable: true })
   plasticVideoFileName: string;
 
-  @Field(() => Float, { nullable: true })
-  paperKgs?: number;
+  @Field(() => Float)
+  paperKgs: number;
 
   @Field({ nullable: true })
   paperVideoFileName: string;
 
-  @Field(() => Float, { nullable: true })
-  metalKgs?: number;
+  @Field(() => Float)
+  metalKgs: number;
 
   @Field({ nullable: true })
   metalVideoFileName: string;
 
-  @Field(() => Float, { nullable: true })
-  glassKgs?: number;
+  @Field(() => Float)
+  glassKgs: number;
 
   @Field({ nullable: true })
   glassVideoFileName: string;
 
-  @Field(() => Float, { nullable: true })
-  organicKgs?: number;
+  @Field(() => Float)
+  organicKgs: number;
 
   @Field({ nullable: true })
   organicVideoFileName: string;

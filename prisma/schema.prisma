@@ -37,19 +37,19 @@ model Form {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  plasticKgs           Decimal? @default(0)
+  plasticKgs           Decimal @default(0)
   plasticVideoFileName String?
 
-  paperKgs           Decimal? @default(0)
+  paperKgs           Decimal @default(0)
   paperVideoFileName String?
 
-  metalKgs           Decimal? @default(0)
+  metalKgs           Decimal @default(0)
   metalVideoFileName String?
 
-  glassKgs           Decimal? @default(0)
+  glassKgs           Decimal @default(0)
   glassVideoFileName String?
 
-  organicKgs           Decimal? @default(0)
+  organicKgs           Decimal @default(0)
   organicVideoFileName String?
 
   createdAt DateTime @default(now())

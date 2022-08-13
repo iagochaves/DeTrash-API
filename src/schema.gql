@@ -49,15 +49,15 @@ scalar DateTime
 
 type Form {
   id: ID!
-  plasticKgs: Float
+  plasticKgs: Float!
   plasticVideoFileName: String
-  paperKgs: Float
+  paperKgs: Float!
   paperVideoFileName: String
-  metalKgs: Float
+  metalKgs: Float!
   metalVideoFileName: String
-  glassKgs: Float
+  glassKgs: Float!
   glassVideoFileName: String
-  organicKgs: Float
+  organicKgs: Float!
   organicVideoFileName: String
   user: User!
   createdAt: DateTime!
@@ -77,9 +77,9 @@ type AggregateFormByUserProfileResponse {
 }
 
 type S3 {
-  createUrl: String
-  fileName: String
-  residue: ResidueType
+  createUrl: String!
+  fileName: String!
+  residue: ResidueType!
 }
 
 """Represents the residue type"""
