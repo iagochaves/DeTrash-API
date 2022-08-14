@@ -13,6 +13,7 @@ import { UsersService } from 'src/services/users.service';
 import { DatabaseModule } from '../database/database.module';
 import { AuthorizationGuard } from './auth/authorization.guard';
 import { FormsResolver } from './graphql/resolvers/forms.resolver';
+import { MeResolver } from './graphql/resolvers/me.resolver';
 import { UsersResolver } from './graphql/resolvers/users.resolver';
 
 @Module({
@@ -33,6 +34,7 @@ import { UsersResolver } from './graphql/resolvers/users.resolver';
     // Resolvers
     UsersResolver,
     FormsResolver,
+    MeResolver,
 
     // Services
     UsersService,

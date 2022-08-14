@@ -35,16 +35,19 @@ export class FormsResolver {
   }
 
   @Query(() => [AggregateFormByUserProfileResponse])
+  @Roles(Role.Admin)
   aggregateFormByUserProfile() {
     return this.formsService.listFormDetails();
   }
 
   @Query(() => Form)
+  @Roles(Role.Admin)
   async form(@Args('formId') formId: string) {
     return this.formsService.findByFormId(formId);
   }
 
   @Query(() => String)
+  @Roles(Role.Admin)
   formVideoUrlByResidue(
     @Args('formId') formId: string,
     @Args('residueType', { type: () => ResidueType }) residueType: ResidueType,

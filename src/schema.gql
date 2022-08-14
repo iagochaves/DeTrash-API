@@ -119,13 +119,13 @@ type Me {
 }
 
 type Query {
-  me: Me!
   user(userAuthId: String!): User!
   users: [User!]!
   forms: [Form!]!
   aggregateFormByUserProfile: [AggregateFormByUserProfileResponse!]!
   form(formId: String!): Form!
   formVideoUrlByResidue(formId: String!, residueType: ResidueType!): String!
+  me: Me!
 }
 
 type Mutation {
