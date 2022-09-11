@@ -40,6 +40,7 @@ type Form {
   glassVideoFileName: String
   organicKgs: Float!
   organicVideoFileName: String
+  isFormAuthorizedByAdmin: Boolean
   user: User!
   createdAt: DateTime!
 }
@@ -112,6 +113,7 @@ type Mutation {
   createUser(data: CreateUserInput!): User!
   updateUser(data: UpdateUserInput!): User!
   createForm(data: CreateFormInput!): CreateFormResponse!
+  authorizeForm(formId: String!, isFormAuthorized: Boolean!): Form!
 }
 
 input CreateUserInput {

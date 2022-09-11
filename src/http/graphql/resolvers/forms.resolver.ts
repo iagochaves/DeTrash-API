@@ -62,4 +62,13 @@ export class FormsResolver {
   ) {
     return this.formsService.createForm({ authUserId: user.sub, ...data });
   }
+
+  @Mutation(() => Form)
+  @Roles(Role.Admin)
+  authorizeForm(
+    @Args('formId') formId: string,
+    @Args('isFormAuthorized') isFormAuthorized: boolean,
+  ) {
+    return this.formsService.authorizeForm(formId, isFormAuthorized);
+  }
 }

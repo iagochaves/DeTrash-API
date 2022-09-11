@@ -55,6 +55,9 @@ export class Form {
   @Field({ nullable: true })
   organicVideoFileName: string;
 
+  @Field({ nullable: true })
+  isFormAuthorizedByAdmin: boolean;
+
   @Field(() => User)
   user: User;
   userId: string;

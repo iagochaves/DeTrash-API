@@ -165,4 +165,18 @@ export class FormsService {
       },
     });
   }
+
+  async authorizeForm(formId: string, isFormAuthorized: boolean) {
+    // TO DO: Check if form was created by a RECYCLER user, we can assume that until Waste Generator type is available to use
+    const form = await this.findByFormId(formId);
+
+    return this.prismaService.form.update({
+      where: {
+        id: form.id,
+      },
+      data: {
+        isFormAuthorizedByAdmin: isFormAuthorized,
+      },
+    });
+  }
 }
