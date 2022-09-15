@@ -58,6 +58,9 @@ export class Form {
   @Field({ nullable: true })
   isFormAuthorizedByAdmin: boolean;
 
+  @Field({ nullable: true })
+  walletAddress: string;
+
   @Field(() => User)
   user: User;
   userId: string;

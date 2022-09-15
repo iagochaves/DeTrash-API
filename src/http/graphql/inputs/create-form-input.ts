@@ -28,4 +28,7 @@ export class CreateFormInput {
 
   @Field(() => ResidueInput, { nullable: true })
   [ResidueType.PLASTIC]?: ResidueInput;
+
+  @Field({ nullable: true })
+  walletAddress?: string;
 }

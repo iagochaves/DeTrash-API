@@ -96,7 +96,11 @@ export class FormsService {
     ];
   }
 
-  async createForm({ authUserId, ...restFormData }: CreateFormInput) {
+  async createForm({
+    authUserId,
+    walletAddress,
+    ...restFormData
+  }: CreateFormInput) {
     const user = await this.usersService.findUserByAuthUserId(authUserId);
 
     const hasUploadedVideo = Object.entries(restFormData).some(
@@ -150,6 +154,7 @@ export class FormsService {
       data: {
         ...formData,
         userId: user.id,
+        walletAddress,
       },
     });
     return {

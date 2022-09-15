@@ -41,6 +41,7 @@ type Form {
   organicKgs: Float!
   organicVideoFileName: String
   isFormAuthorizedByAdmin: Boolean
+  walletAddress: String
   user: User!
   createdAt: DateTime!
 }
@@ -136,6 +137,7 @@ input CreateFormInput {
   ORGANIC: ResidueInput
   PAPER: ResidueInput
   PLASTIC: ResidueInput
+  walletAddress: String
 }
 
 input ResidueInput {
