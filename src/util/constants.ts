@@ -16,21 +16,26 @@ export const RESIDUES_FIELDS_BY_TYPE = {
   [ResidueType.GLASS]: {
     amountField: 'glassKgs',
     videoFileNameField: 'glassVideoFileName',
+    invoiceFileNameField: 'glassInvoiceFileName',
   },
   [ResidueType.METAL]: {
     amountField: 'metalKgs',
     videoFileNameField: 'metalVideoFileName',
+    invoiceFileNameField: 'metalInvoiceFileName',
   },
   [ResidueType.PAPER]: {
     amountField: 'paperKgs',
     videoFileNameField: 'paperVideoFileName',
+    invoiceFileNameField: 'paperInvoiceFileName',
   },
   [ResidueType.ORGANIC]: {
     amountField: 'organicKgs',
     videoFileNameField: 'organicVideoFileName',
+    invoiceFileNameField: 'organicInvoiceFileName',
   },
   [ResidueType.PLASTIC]: {
     amountField: 'plasticKgs',
     videoFileNameField: 'plasticVideoFileName',
+    invoiceFileNameField: 'plasticInvoiceFileName',
   },
 };

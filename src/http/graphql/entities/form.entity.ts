@@ -31,11 +31,17 @@ export class Form {
   @Field({ nullable: true })
   plasticVideoFileName: string;
 
+  @Field({ nullable: true })
+  plasticInvoiceFileName: string;
+
   @Field(() => Float)
   paperKgs: number;
 
   @Field({ nullable: true })
   paperVideoFileName: string;
+
+  @Field({ nullable: true })
+  paperInvoiceFileName: string;
 
   @Field(() => Float)
   metalKgs: number;
@@ -43,17 +49,26 @@ export class Form {
   @Field({ nullable: true })
   metalVideoFileName: string;
 
+  @Field({ nullable: true })
+  metalInvoiceFileName: string;
+
   @Field(() => Float)
   glassKgs: number;
 
   @Field({ nullable: true })
   glassVideoFileName: string;
 
+  @Field({ nullable: true })
+  glassInvoiceFileName: string;
+
   @Field(() => Float)
   organicKgs: number;
 
   @Field({ nullable: true })
   organicVideoFileName: string;
+
+  @Field({ nullable: true })
+  organicInvoiceFileName: string;
 
   @Field({ nullable: true })
   isFormAuthorizedByAdmin: boolean;

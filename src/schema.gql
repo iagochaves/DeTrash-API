@@ -32,14 +32,19 @@ type Form {
   id: ID!
   plasticKgs: Float!
   plasticVideoFileName: String
+  plasticInvoiceFileName: String
   paperKgs: Float!
   paperVideoFileName: String
+  paperInvoiceFileName: String
   metalKgs: Float!
   metalVideoFileName: String
+  metalInvoiceFileName: String
   glassKgs: Float!
   glassVideoFileName: String
+  glassInvoiceFileName: String
   organicKgs: Float!
   organicVideoFileName: String
+  organicInvoiceFileName: String
   isFormAuthorizedByAdmin: Boolean
   walletAddress: String
   user: User!
@@ -60,8 +65,10 @@ type AggregateFormByUserProfileResponse {
 }
 
 type S3 {
-  createUrl: String!
-  fileName: String!
+  videoCreateUrl: String
+  videoFileName: String
+  invoiceCreateUrl: String
+  invoiceFileName: String
   residue: ResidueType!
 }
 
@@ -143,4 +150,5 @@ input CreateFormInput {
 input ResidueInput {
   amount: Float
   videoFileName: String
+  invoiceFileName: String
 }

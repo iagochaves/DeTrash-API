@@ -103,43 +103,71 @@ export class FormsService {
   }: CreateFormInput) {
     const user = await this.usersService.findUserByAuthUserId(authUserId);
 
-    const hasUploadedVideo = Object.entries(restFormData).some(
-      ([, residueProps]) => residueProps?.videoFileName,
+    const hasUploadedVideoOrInvoice = Object.entries(restFormData).some(
+      ([, residueProps]) =>
+        residueProps?.videoFileName || residueProps?.invoiceFileName,
     );
 
-    if (user.profileType !== 'RECYCLER' && hasUploadedVideo) {
+    if (user.profileType !== 'RECYCLER' && hasUploadedVideoOrInvoice) {
       throw new ForbiddenException(MessagesHelper.USER_NOT_RECYCLER);
     }
     const formData = {} as CreateFormInput;
     let responseData = [];
 
-    if (hasUploadedVideo) {
+    if (hasUploadedVideoOrInvoice) {
       const s3Data = await Object.entries(restFormData).reduce(
-        async (asyncAllVideos, [residueType, residueProps]) => {
-          const allVideos = await asyncAllVideos;
+        async (asyncAllObjects, [residueType, residueProps]) => {
+          const allDocuments = await asyncAllObjects;
 
-          const { fileName: s3FileName, createUrl } =
-            await this.s3Service.createPreSignedObjectUrl(
-              residueProps.videoFileName,
-              residueType,
-            );
+          let s3CreateVideoFileName = '';
+          let s3CreateInvoiceFileName = '';
 
           const databaseResidueVideoField =
             RESIDUES_FIELDS_BY_TYPE[residueType].videoFileNameField;
+
+          const databaseResidueInvoiceField =
+            RESIDUES_FIELDS_BY_TYPE[residueType].invoiceFileNameField;
+
+          if (residueProps.videoFileName) {
+            const { fileName: s3FileName, createUrl } =
+              await this.s3Service.createPreSignedObjectUrl(
+                residueProps.videoFileName,
+                residueType,
+              );
+
+            s3CreateVideoFileName = createUrl;
+
+            Object.assign(formData, {
+              [databaseResidueVideoField]: s3FileName,
+            });
+          }
+
+          if (residueProps.invoiceFileName) {
+            const { fileName: s3FileName, createUrl } =
+              await this.s3Service.createPreSignedObjectUrl(
+                residueProps.invoiceFileName,
+                residueType,
+              );
+            s3CreateInvoiceFileName = createUrl;
+
+            Object.assign(formData, {
+              [databaseResidueInvoiceField]: s3FileName,
+            });
+          }
 
           const databaseResidueAmountField =
             RESIDUES_FIELDS_BY_TYPE[residueType].amountField;
 
           Object.assign(formData, {
-            [databaseResidueVideoField]: s3FileName,
             [databaseResidueAmountField]: residueProps.amount,
           });
-
           return [
-            ...allVideos,
+            ...allDocuments,
             {
-              fileName: s3FileName,
-              createUrl,
+              invoiceCreateUrl: s3CreateInvoiceFileName,
+              invoiceFileName: formData[databaseResidueInvoiceField],
+              videoCreateUrl: s3CreateVideoFileName,
+              videoFileName: formData[databaseResidueVideoField],
               residue: residueType,
             },
           ];
@@ -157,6 +185,7 @@ export class FormsService {
         walletAddress,
       },
     });
+
     return {
       form,
       s3: responseData,
