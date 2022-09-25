@@ -20,16 +20,24 @@ export class FormsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getFormVideoUrl(formId: string, residueType: ResidueType) {
+  async getFormDocumentsUrl(formId: string, residueType: ResidueType) {
     const formData = await this.findByFormId(formId);
 
     const residueVideoField =
       RESIDUES_FIELDS_BY_TYPE[residueType].videoFileNameField;
 
-    if (!formData[residueVideoField])
-      throw new BadRequestException(MessagesHelper.FORM_DOES_NOT_HAVE_VIDEO);
+    const residueInvoiceField =
+      RESIDUES_FIELDS_BY_TYPE[residueType].invoiceFileNameField;
 
-    return this.s3Service.getPreSignedObjectUrl(formData[residueVideoField]);
+    const [videoFileUrl, invoiceFileUrl] = await Promise.all([
+      this.s3Service.getPreSignedObjectUrl(formData[residueVideoField]),
+      this.s3Service.getPreSignedObjectUrl(formData[residueInvoiceField]),
+    ]);
+
+    return {
+      videoFileUrl,
+      invoiceFileUrl,
+    };
   }
 
   async findByFormId(id: string) {

@@ -24,7 +24,9 @@ export class S3Service implements IS3Service {
     });
   }
 
-  async getPreSignedObjectUrl(fileName: string): Promise<string> {
+  async getPreSignedObjectUrl(fileName: string): Promise<string | null> {
+    if (!fileName) return null;
+
     const getObjectCommand = new GetObjectCommand({
       Bucket: this.configService.get('BUCKET_NAME') ?? '',
       Key: fileName,

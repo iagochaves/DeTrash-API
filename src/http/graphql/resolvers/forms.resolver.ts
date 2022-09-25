@@ -15,6 +15,7 @@ import { Form, ResidueType } from '../entities/form.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
 import { AggregateFormByUserProfileResponse } from '../responses/aggregate-form-by-user-profile-response';
 import { CreateFormResponse } from '../responses/create-form-response';
+import { GetFormDocumentsUrl } from '../responses/get-form-documents-url';
 
 @Resolver(() => Form)
 export class FormsResolver {
@@ -46,13 +47,13 @@ export class FormsResolver {
     return this.formsService.findByFormId(formId);
   }
 
-  @Query(() => String)
+  @Query(() => GetFormDocumentsUrl)
   @Roles(Role.Admin)
-  formVideoUrlByResidue(
+  formDocumentsUrlByResidue(
     @Args('formId') formId: string,
     @Args('residueType', { type: () => ResidueType }) residueType: ResidueType,
   ) {
-    return this.formsService.getFormVideoUrl(formId, residueType);
+    return this.formsService.getFormDocumentsUrl(formId, residueType);
   }
 
   @Mutation(() => CreateFormResponse)

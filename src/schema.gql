@@ -88,6 +88,11 @@ type CreateFormResponse {
   s3: [S3!]
 }
 
+type GetFormDocumentsUrl {
+  videoFileUrl: String
+  invoiceFileUrl: String
+}
+
 type Permissions {
   type: String!
 }
@@ -113,7 +118,7 @@ type Query {
   forms: [Form!]!
   aggregateFormByUserProfile: [AggregateFormByUserProfileResponse!]!
   form(formId: String!): Form!
-  formVideoUrlByResidue(formId: String!, residueType: ResidueType!): String!
+  formDocumentsUrlByResidue(formId: String!, residueType: ResidueType!): GetFormDocumentsUrl!
   me: Me!
 }
 
