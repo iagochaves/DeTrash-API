@@ -1,7 +1,8 @@
 const usersMessages = {
   USER_EXISTS: 'User already exists',
   USER_NOT_FOUND: 'User not found',
-  USER_NOT_RECYCLER: 'User is not a Recycler',
+  USER_DOES_NOT_HAS_PERMISSION_TO_UPLOAD:
+    'User do not have permission to submit files',
 };
 
 const formMessages = {

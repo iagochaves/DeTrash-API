@@ -8,6 +8,7 @@ import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { ResidueType } from 'src/http/graphql/entities/form.entity';
 import { DocumentType } from 'src/http/graphql/entities/S3.entity';
+import { ProfileType } from 'src/http/graphql/entities/user.entity';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
 import { RESIDUES_FIELDS_BY_TYPE } from 'src/util/constants';
 import { S3Service } from './s3.service';
@@ -117,8 +118,14 @@ export class FormsService {
         residueProps?.videoFileName || residueProps?.invoiceFileName,
     );
 
-    if (user.profileType !== 'RECYCLER' && hasUploadedVideoOrInvoice) {
-      throw new ForbiddenException(MessagesHelper.USER_NOT_RECYCLER);
+    if (
+      user.profileType !== ProfileType.RECYCLER &&
+      user.profileType !== ProfileType.WASTE_GENERATOR &&
+      hasUploadedVideoOrInvoice
+    ) {
+      throw new ForbiddenException(
+        MessagesHelper.USER_DOES_NOT_HAS_PERMISSION_TO_UPLOAD,
+      );
     }
     const formData = {} as CreateFormInput;
     let responseData = [];
@@ -211,6 +218,7 @@ export class FormsService {
 
   async authorizeForm(formId: string, isFormAuthorized: boolean) {
     // TO DO: Check if form was created by a RECYCLER user, we can assume that until Waste Generator type is available to use
+    // Discuss rules for approving Forms by Waste Generator
     const form = await this.findByFormId(formId);
 
     return this.prismaService.form.update({
