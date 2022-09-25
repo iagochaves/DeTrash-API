@@ -12,10 +12,10 @@ import { FormsService } from 'src/services/forms.service';
 import { UsersService } from 'src/services/users.service';
 import { Role } from 'src/util/constants';
 import { Form, ResidueType } from '../entities/form.entity';
+import { DocumentType } from '../entities/S3.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
 import { AggregateFormByUserProfileResponse } from '../responses/aggregate-form-by-user-profile-response';
 import { CreateFormResponse } from '../responses/create-form-response';
-import { GetFormDocumentsUrl } from '../responses/get-form-documents-url';
 
 @Resolver(() => Form)
 export class FormsResolver {
@@ -47,13 +47,19 @@ export class FormsResolver {
     return this.formsService.findByFormId(formId);
   }
 
-  @Query(() => GetFormDocumentsUrl)
+  @Query(() => String)
   @Roles(Role.Admin)
   formDocumentsUrlByResidue(
     @Args('formId') formId: string,
     @Args('residueType', { type: () => ResidueType }) residueType: ResidueType,
+    @Args('documentType', { type: () => DocumentType })
+    documentType: DocumentType,
   ) {
-    return this.formsService.getFormDocumentsUrl(formId, residueType);
+    return this.formsService.getFormDocumentsUrl(
+      formId,
+      residueType,
+      documentType,
+    );
   }
 
   @Mutation(() => CreateFormResponse)

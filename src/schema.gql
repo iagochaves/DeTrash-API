@@ -51,19 +51,6 @@ type Form {
   createdAt: DateTime!
 }
 
-type AggregateFormData {
-  plasticKgs: Float
-  paperKgs: Float
-  metalKgs: Float
-  glassKgs: Float
-  organicKgs: Float
-}
-
-type AggregateFormByUserProfileResponse {
-  id: ProfileType!
-  data: AggregateFormData!
-}
-
 type S3 {
   videoCreateUrl: String
   videoFileName: String
@@ -81,16 +68,24 @@ enum ResidueType {
   PLASTIC
 }
 
+type AggregateFormData {
+  plasticKgs: Float
+  paperKgs: Float
+  metalKgs: Float
+  glassKgs: Float
+  organicKgs: Float
+}
+
+type AggregateFormByUserProfileResponse {
+  id: ProfileType!
+  data: AggregateFormData!
+}
+
 type CreateFormResponse {
   form: Form!
 
   """Field regarding informations on AWS S3"""
   s3: [S3!]
-}
-
-type GetFormDocumentsUrl {
-  videoFileUrl: String
-  invoiceFileUrl: String
 }
 
 type Permissions {
@@ -118,8 +113,14 @@ type Query {
   forms: [Form!]!
   aggregateFormByUserProfile: [AggregateFormByUserProfileResponse!]!
   form(formId: String!): Form!
-  formDocumentsUrlByResidue(formId: String!, residueType: ResidueType!): GetFormDocumentsUrl!
+  formDocumentsUrlByResidue(formId: String!, residueType: ResidueType!, documentType: DocumentType!): String!
   me: Me!
+}
+
+"""Represents the document type"""
+enum DocumentType {
+  INVOICE
+  VIDEO
 }
 
 type Mutation {

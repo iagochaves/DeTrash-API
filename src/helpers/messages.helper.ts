@@ -6,7 +6,7 @@ const usersMessages = {
 
 const formMessages = {
   FORM_NOT_FOUND: 'Form not found',
-  FORM_DOES_NOT_HAVE_VIDEO: 'Form does not provides a video',
+  FORM_DOES_NOT_HAVE_DOCUMENT: 'Form does not provides the document requested',
 };
 
 const fileMessages = {
