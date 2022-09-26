@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import axios from 'axios';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { ResidueType } from 'src/http/graphql/entities/form.entity';
@@ -288,8 +287,9 @@ export class FormsService {
       ],
     );
 
+    const fileName = `${form.id}.json`;
     const createMetadataUrl = await this.createOnPublicObject(
-      `${form.id}.json`,
+      fileName,
       'metadata',
     );
     const objectUrl = new URL(createMetadataUrl);
@@ -301,25 +301,20 @@ export class FormsService {
       name: user.email,
     };
 
-    const bufferData = Buffer.from(JSON.stringify(JsonMetadata));
+    const formMetadataUrl = `${objectUrl.origin}${objectUrl.pathname}`;
 
-    const { status } = await axios.put(createMetadataUrl, bufferData);
+    await this.prismaService.form.update({
+      where: {
+        id: formId,
+      },
+      data: {
+        formMetadataUrl,
+      },
+    });
 
-    if (status === 200) {
-      const formMetadataUrl = `${objectUrl.origin}${objectUrl.pathname}`;
-
-      this.prismaService.form.update({
-        where: {
-          id: formId,
-        },
-        data: {
-          formMetadataUrl,
-        },
-      });
-
-      return formMetadataUrl;
-    }
-
-    throw new BadRequestException();
+    return {
+      createMetadataUrl,
+      body: JSON.stringify(JsonMetadata, null, 2),
+    };
   }
 }

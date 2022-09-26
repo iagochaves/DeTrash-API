@@ -89,6 +89,11 @@ type CreateFormResponse {
   s3: [S3!]
 }
 
+type SubmitNFTResponse {
+  createMetadataUrl: String!
+  body: String!
+}
+
 type Permissions {
   type: String!
 }
@@ -130,7 +135,7 @@ type Mutation {
   createForm(data: CreateFormInput!): CreateFormResponse!
   authorizeForm(formId: String!, isFormAuthorized: Boolean!): Form!
   submitFormImage(formId: String!): String!
-  createNFT(formId: String!): String!
+  createNFT(formId: String!): SubmitNFTResponse!
 }
 
 input CreateUserInput {

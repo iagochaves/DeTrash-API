@@ -16,6 +16,7 @@ import { DocumentType } from '../entities/S3.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
 import { AggregateFormByUserProfileResponse } from '../responses/aggregate-form-by-user-profile-response';
 import { CreateFormResponse } from '../responses/create-form-response';
+import { SubmitNFTResponse } from '../responses/submit-nft';
 
 @Resolver(() => Form)
 export class FormsResolver {
@@ -85,7 +86,7 @@ export class FormsResolver {
     return this.formsService.submitFormImage(formId);
   }
 
-  @Mutation(() => String)
+  @Mutation(() => SubmitNFTResponse)
   @Roles(Role.Admin)
   createNFT(@Args('formId') formId: string) {
     return this.formsService.createNFT(formId);
