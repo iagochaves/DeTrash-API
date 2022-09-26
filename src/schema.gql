@@ -47,6 +47,7 @@ type Form {
   organicInvoiceFileName: String
   isFormAuthorizedByAdmin: Boolean
   walletAddress: String
+  formMetadataUrl: String
   user: User!
   createdAt: DateTime!
 }

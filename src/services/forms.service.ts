@@ -306,7 +306,18 @@ export class FormsService {
     const { status } = await axios.put(createMetadataUrl, bufferData);
 
     if (status === 200) {
-      return `${objectUrl.origin}${objectUrl.pathname}`;
+      const formMetadataUrl = `${objectUrl.origin}${objectUrl.pathname}`;
+
+      this.prismaService.form.update({
+        where: {
+          id: formId,
+        },
+        data: {
+          formMetadataUrl,
+        },
+      });
+
+      return formMetadataUrl;
     }
 
     throw new BadRequestException();

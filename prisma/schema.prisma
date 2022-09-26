@@ -61,6 +61,8 @@ model Form {
 
   isFormAuthorizedByAdmin Boolean?
 
+  formMetadataUrl String?
+
   walletAddress String?
 
   createdAt DateTime @default(now())

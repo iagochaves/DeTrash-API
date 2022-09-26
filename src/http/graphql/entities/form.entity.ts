@@ -76,6 +76,9 @@ export class Form {
   @Field({ nullable: true })
   walletAddress: string;
 
+  @Field({ nullable: true })
+  formMetadataUrl: string;
+
   @Field(() => User)
   user: User;
   userId: string;
