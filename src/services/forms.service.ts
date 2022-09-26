@@ -297,7 +297,7 @@ export class FormsService {
     const JsonMetadata = {
       attributes: residueAttributes,
       description: 'RECY Report',
-      image: `${objectUrl.origin}/images/${form.id}.json`,
+      image: `${objectUrl.origin}/images/${form.id}.png`,
       name: user.email,
     };
 
