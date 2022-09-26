@@ -78,4 +78,16 @@ export class FormsResolver {
   ) {
     return this.formsService.authorizeForm(formId, isFormAuthorized);
   }
+
+  @Mutation(() => String)
+  @Roles(Role.Admin)
+  submitFormImage(@Args('formId') formId: string) {
+    return this.formsService.submitFormImage(formId);
+  }
+
+  @Mutation(() => String)
+  @Roles(Role.Admin)
+  createNFT(@Args('formId') formId: string) {
+    return this.formsService.createNFT(formId);
+  }
 }

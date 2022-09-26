@@ -128,6 +128,8 @@ type Mutation {
   updateUser(data: UpdateUserInput!): User!
   createForm(data: CreateFormInput!): CreateFormResponse!
   authorizeForm(formId: String!, isFormAuthorized: Boolean!): Form!
+  submitFormImage(formId: String!): String!
+  createNFT(formId: String!): String!
 }
 
 input CreateUserInput {

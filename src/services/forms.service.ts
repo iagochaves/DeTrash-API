@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import axios from 'axios';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { ResidueType } from 'src/http/graphql/entities/form.entity';
@@ -11,6 +12,7 @@ import { DocumentType } from 'src/http/graphql/entities/S3.entity';
 import { ProfileType } from 'src/http/graphql/entities/user.entity';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
 import { RESIDUES_FIELDS_BY_TYPE } from 'src/util/constants';
+import { getResidueTitle } from 'src/util/getResidueTitle';
 import { S3Service } from './s3.service';
 import { UsersService } from './users.service';
 
@@ -229,5 +231,84 @@ export class FormsService {
         isFormAuthorizedByAdmin: isFormAuthorized,
       },
     });
+  }
+
+  async createOnPublicObject(fileName: string, basePath: string) {
+    const publicBucket = 'detrash-public';
+
+    const createPublicUrl = await this.s3Service.createPreSignedObjectUrl(
+      fileName,
+      '',
+      basePath,
+      publicBucket,
+    );
+
+    return createPublicUrl.createUrl;
+  }
+
+  async submitFormImage(formId: string) {
+    const form = await this.findByFormId(formId);
+
+    const createImageUrl = this.createOnPublicObject(
+      `${form.id}.png`,
+      'images',
+    );
+
+    return createImageUrl;
+  }
+
+  async createNFT(formId: string) {
+    const form = await this.findByFormId(formId);
+
+    const user = await this.usersService.findUserByUserId(form.userId);
+
+    const residueAttributes = Object.entries(RESIDUES_FIELDS_BY_TYPE).reduce(
+      (allAtributes, [residueType, residueAttributes]) => {
+        const residueAmount = form[residueAttributes.amountField];
+
+        if (residueAmount > 0) {
+          const residueTitleFormat = getResidueTitle(residueType);
+
+          allAtributes.push({
+            trait_type: `${residueTitleFormat} kgs`,
+            value: residueAmount,
+          });
+        }
+        return allAtributes;
+      },
+      [
+        {
+          trait_type: 'Originating wallet',
+          value: form.walletAddress || '0x0',
+        },
+        {
+          trait_type: 'Audit',
+          value: form.isFormAuthorizedByAdmin ? 'Verified' : 'Not Verified',
+        },
+      ],
+    );
+
+    const createMetadataUrl = await this.createOnPublicObject(
+      `${form.id}.json`,
+      'metadata',
+    );
+    const objectUrl = new URL(createMetadataUrl);
+
+    const JsonMetadata = {
+      attributes: residueAttributes,
+      description: 'RECY Report',
+      image: `${objectUrl.origin}/images/${form.id}.json`,
+      name: user.email,
+    };
+
+    const bufferData = Buffer.from(JSON.stringify(JsonMetadata));
+
+    const { status } = await axios.put(createMetadataUrl, bufferData);
+
+    if (status === 200) {
+      return `${objectUrl.origin}${objectUrl.pathname}`;
+    }
+
+    throw new BadRequestException();
   }
 }

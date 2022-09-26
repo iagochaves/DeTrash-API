@@ -24,13 +24,28 @@ export class S3Service implements IS3Service {
     });
   }
 
-  async getPreSignedObjectUrl(fileName: string): Promise<string | null> {
+  async getPreSignedObjectUrl(
+    fileName: string,
+    basePath?: string,
+    bucketName?: string,
+    isFileDownloadable = true,
+  ): Promise<string | null> {
     if (!fileName) return null;
 
+    const objectProperties = {};
+
+    if (isFileDownloadable) {
+      Object.assign(objectProperties, {
+        ResponseContentDisposition: `attachment; filename="${fileName}"`,
+      });
+    }
+
+    const bucket = bucketName || this.configService.get('BUCKET_NAME');
+
     const getObjectCommand = new GetObjectCommand({
-      Bucket: this.configService.get('BUCKET_NAME') ?? '',
-      Key: fileName,
-      ResponseContentDisposition: `attachment; filename="${fileName}"`,
+      Bucket: bucket ?? '',
+      Key: basePath ? `${basePath}/${fileName}` : fileName,
+      ...objectProperties,
     });
 
     const authorizedUrlGetObject = await getSignedUrl(
@@ -47,14 +62,22 @@ export class S3Service implements IS3Service {
   async createPreSignedObjectUrl(
     fileName: string,
     residueType: string,
+    basePath?: string,
+    bucketName?: string,
   ): Promise<IS3CreateResponseData> {
     const hash = randomBytes(16);
 
-    const hashedFileName = `${hash.toString('hex')}-${residueType}-${fileName}`;
+    const bucket = bucketName || this.configService.get('BUCKET_NAME');
+
+    let hashedFileName = fileName;
+
+    if (residueType) {
+      hashedFileName = `${hash.toString('hex')}-${residueType}-${fileName}`;
+    }
 
     const putObjectCommand = new PutObjectCommand({
-      Bucket: this.configService.get('BUCKET_NAME') ?? '',
-      Key: hashedFileName,
+      Bucket: bucket ?? '',
+      Key: basePath ? `${basePath}/${hashedFileName}` : hashedFileName,
     });
 
     const authorizedUrlPutObject = await getSignedUrl(
