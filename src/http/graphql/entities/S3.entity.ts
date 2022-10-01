@@ -1,15 +1,5 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { ResidueType } from './form.entity';
-
-export enum DocumentType {
-  INVOICE = 'INVOICE',
-  VIDEO = 'VIDEO',
-}
-
-registerEnumType(DocumentType, {
-  name: 'DocumentType',
-  description: 'Represents the document type',
-});
 
 @ObjectType()
 export class S3 {
@@ -19,11 +9,11 @@ export class S3 {
   @Field({ nullable: true })
   videoFileName: string;
 
-  @Field({ nullable: true })
-  invoiceCreateUrl: string;
+  @Field(() => [String])
+  invoicesCreateUrl: string[];
 
-  @Field({ nullable: true })
-  invoiceFileName: string;
+  @Field(() => [String])
+  invoicesFileName: string[];
 
   @Field(() => ResidueType)
   residue: ResidueType;

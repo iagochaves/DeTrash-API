@@ -8,21 +8,23 @@ import {
 } from '@nestjs/graphql';
 import { AuthUser, CurrentUser } from 'src/http/auth/current-user';
 import { Roles } from 'src/http/auth/roles.decorator';
+import { DocumentsService } from 'src/services/documents.service';
 import { FormsService } from 'src/services/forms.service';
 import { UsersService } from 'src/services/users.service';
 import { Role } from 'src/util/constants';
-import { Form, ResidueType } from '../entities/form.entity';
-import { DocumentType } from '../entities/S3.entity';
+import { Document } from '../entities/document.entity';
+import { Form } from '../entities/form.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
 import { AggregateFormByUserProfileResponse } from '../responses/aggregate-form-by-user-profile-response';
 import { CreateFormResponse } from '../responses/create-form-response';
-import { SubmitNFTResponse } from '../responses/submit-nft';
+import { SubmitNFTResponse } from '../responses/submit-nft-response';
 
 @Resolver(() => Form)
 export class FormsResolver {
   constructor(
     private formsService: FormsService,
     private usersService: UsersService,
+    private documentsService: DocumentsService,
   ) {}
 
   @Query(() => [Form])
@@ -36,6 +38,11 @@ export class FormsResolver {
     return this.usersService.findUserByUserId(form.userId);
   }
 
+  @ResolveField(() => [Document])
+  documents(@Parent() form: Form) {
+    return this.documentsService.listDocumentsFromForm(form.id);
+  }
+
   @Query(() => [AggregateFormByUserProfileResponse])
   @Roles(Role.Admin)
   aggregateFormByUserProfile() {
@@ -46,21 +53,6 @@ export class FormsResolver {
   @Roles(Role.Admin)
   async form(@Args('formId') formId: string) {
     return this.formsService.findByFormId(formId);
-  }
-
-  @Query(() => String)
-  @Roles(Role.Admin)
-  formDocumentsUrlByResidue(
-    @Args('formId') formId: string,
-    @Args('residueType', { type: () => ResidueType }) residueType: ResidueType,
-    @Args('documentType', { type: () => DocumentType })
-    documentType: DocumentType,
-  ) {
-    return this.formsService.getFormDocumentsUrl(
-      formId,
-      residueType,
-      documentType,
-    );
   }
 
   @Mutation(() => CreateFormResponse)
@@ -88,7 +80,13 @@ export class FormsResolver {
 
   @Mutation(() => SubmitNFTResponse)
   @Roles(Role.Admin)
-  createNFT(@Args('formId') formId: string) {
-    return this.formsService.createNFT(formId);
+  createFormMetadata(@Args('formId') formId: string) {
+    return this.formsService.createFormMetadata(formId);
+  }
+
+  @Query(() => String)
+  @Roles(Role.Admin)
+  test() {
+    return this.formsService.test();
   }
 }

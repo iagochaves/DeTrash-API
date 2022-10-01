@@ -5,6 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { Document } from './document.entity';
 import { User } from './user.entity';
 
 export enum ResidueType {
@@ -82,6 +83,9 @@ export class Form {
   @Field(() => User)
   user: User;
   userId: string;
+
+  @Field(() => [Document])
+  documents: Document[];
 
   @Field(() => Date)
   createdAt: Date;

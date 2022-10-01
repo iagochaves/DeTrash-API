@@ -7,7 +7,10 @@ const usersMessages = {
 
 const formMessages = {
   FORM_NOT_FOUND: 'Form not found',
-  FORM_DOES_NOT_HAVE_DOCUMENT: 'Form does not provides the document requested',
+};
+
+const documentMessages = {
+  DOCUMENT_NOT_FOUND: 'Document not found',
 };
 
 const fileMessages = {
@@ -19,4 +22,5 @@ export const MessagesHelper = {
   ...usersMessages,
   ...formMessages,
   ...fileMessages,
+  ...documentMessages,
 };

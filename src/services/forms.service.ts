@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,11 +6,10 @@ import {
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { ResidueType } from 'src/http/graphql/entities/form.entity';
-import { DocumentType } from 'src/http/graphql/entities/S3.entity';
 import { ProfileType } from 'src/http/graphql/entities/user.entity';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
-import { RESIDUES_FIELDS_BY_TYPE } from 'src/util/constants';
 import { getResidueTitle } from 'src/util/getResidueTitle';
+import { DocumentsService } from './documents.service';
 import { S3Service } from './s3.service';
 import { UsersService } from './users.service';
 
@@ -21,27 +19,8 @@ export class FormsService {
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
     private readonly usersService: UsersService,
+    private readonly documentsService: DocumentsService,
   ) {}
-
-  async getFormDocumentsUrl(
-    formId: string,
-    residueType: ResidueType,
-    documentType: DocumentType,
-  ) {
-    const formData = await this.findByFormId(formId);
-
-    const residueFieldByDocument =
-      documentType === DocumentType.INVOICE
-        ? RESIDUES_FIELDS_BY_TYPE[residueType].invoiceFileNameField
-        : RESIDUES_FIELDS_BY_TYPE[residueType].videoFileNameField;
-
-    if (!formData[residueFieldByDocument])
-      throw new BadRequestException(MessagesHelper.FORM_DOES_NOT_HAVE_DOCUMENT);
-
-    return this.s3Service.getPreSignedObjectUrl(
-      formData[residueFieldByDocument],
-    );
-  }
 
   async findByFormId(id: string) {
     const form = await this.prismaService.form.findUnique({
@@ -116,7 +95,7 @@ export class FormsService {
 
     const hasUploadedVideoOrInvoice = Object.entries(restFormData).some(
       ([, residueProps]) =>
-        residueProps?.videoFileName || residueProps?.invoiceFileName,
+        residueProps?.videoFileName || residueProps.invoicesFileName.length,
     );
 
     if (
@@ -128,22 +107,31 @@ export class FormsService {
         MessagesHelper.USER_DOES_NOT_HAS_PERMISSION_TO_UPLOAD,
       );
     }
-    const formData = {} as CreateFormInput;
+
     let responseData = [];
+
+    const form = await this.prismaService.form.create({
+      data: {
+        userId: user.id,
+        walletAddress,
+      },
+    });
 
     if (hasUploadedVideoOrInvoice) {
       const s3Data = await Object.entries(restFormData).reduce(
         async (asyncAllObjects, [residueType, residueProps]) => {
           const allDocuments = await asyncAllObjects;
 
+          const documentEntity = {
+            formId: form.id,
+            residueType: residueType as ResidueType,
+            invoicesFileName: [],
+            amount: residueProps.amount,
+            videoFileName: null,
+          };
+
           let s3CreateVideoFileName = '';
-          let s3CreateInvoiceFileName = '';
-
-          const databaseResidueVideoField =
-            RESIDUES_FIELDS_BY_TYPE[residueType].videoFileNameField;
-
-          const databaseResidueInvoiceField =
-            RESIDUES_FIELDS_BY_TYPE[residueType].invoiceFileNameField;
+          const s3CreateInvoiceFileName: string[] = [];
 
           if (residueProps.videoFileName) {
             const { fileName: s3FileName, createUrl } =
@@ -153,38 +141,37 @@ export class FormsService {
               );
 
             s3CreateVideoFileName = createUrl;
+            documentEntity.videoFileName = s3FileName;
+          }
 
-            Object.assign(formData, {
-              [databaseResidueVideoField]: s3FileName,
+          if (residueProps.invoicesFileName.length) {
+            const invoicesS3Response = await Promise.all(
+              residueProps.invoicesFileName.map((invoiceFile) => {
+                return this.s3Service.createPreSignedObjectUrl(
+                  invoiceFile,
+                  residueType,
+                );
+              }),
+            );
+            invoicesS3Response.forEach(({ createUrl, fileName }) => {
+              s3CreateInvoiceFileName.push(createUrl);
+              documentEntity.invoicesFileName.push(fileName);
             });
           }
 
-          if (residueProps.invoiceFileName) {
-            const { fileName: s3FileName, createUrl } =
-              await this.s3Service.createPreSignedObjectUrl(
-                residueProps.invoiceFileName,
-                residueType,
-              );
-            s3CreateInvoiceFileName = createUrl;
-
-            Object.assign(formData, {
-              [databaseResidueInvoiceField]: s3FileName,
-            });
-          }
-
-          const databaseResidueAmountField =
-            RESIDUES_FIELDS_BY_TYPE[residueType].amountField;
-
-          Object.assign(formData, {
-            [databaseResidueAmountField]: residueProps.amount,
+          const residueDocument = await this.prismaService.document.create({
+            data: {
+              ...documentEntity,
+            },
           });
+
           return [
             ...allDocuments,
             {
-              invoiceCreateUrl: s3CreateInvoiceFileName,
-              invoiceFileName: formData[databaseResidueInvoiceField],
+              invoicesCreateUrl: s3CreateInvoiceFileName,
+              invoicesFileName: residueDocument.invoicesFileName,
               videoCreateUrl: s3CreateVideoFileName,
-              videoFileName: formData[databaseResidueVideoField],
+              videoFileName: residueDocument.videoFileName,
               residue: residueType,
             },
           ];
@@ -194,14 +181,6 @@ export class FormsService {
 
       responseData = s3Data;
     }
-
-    const form = await this.prismaService.form.create({
-      data: {
-        ...formData,
-        userId: user.id,
-        walletAddress,
-      },
-    });
 
     return {
       form,
@@ -256,23 +235,23 @@ export class FormsService {
     return createImageUrl;
   }
 
-  async createNFT(formId: string) {
+  async createFormMetadata(formId: string) {
     const form = await this.findByFormId(formId);
 
-    const user = await this.usersService.findUserByUserId(form.userId);
+    const [user, documents] = await Promise.all([
+      this.usersService.findUserByUserId(form.userId),
+      this.documentsService.listDocumentsFromForm(formId),
+    ]);
 
-    const residueAttributes = Object.entries(RESIDUES_FIELDS_BY_TYPE).reduce(
-      (allAtributes, [residueType, residueAttributes]) => {
-        const residueAmount = form[residueAttributes.amountField];
+    const residueAttributes = documents.reduce(
+      (allAtributes, residueDocument) => {
+        const residueTitleFormat = getResidueTitle(residueDocument.residueType);
 
-        if (residueAmount > 0) {
-          const residueTitleFormat = getResidueTitle(residueType);
+        allAtributes.push({
+          trait_type: `${residueTitleFormat} kgs`,
+          value: String(residueDocument.amount),
+        });
 
-          allAtributes.push({
-            trait_type: `${residueTitleFormat} kgs`,
-            value: residueAmount,
-          });
-        }
         return allAtributes;
       },
       [
@@ -316,5 +295,73 @@ export class FormsService {
       createMetadataUrl,
       body: JSON.stringify(JsonMetadata, null, 2),
     };
+  }
+
+  async test() {
+    const forms = await this.prismaService.form.findMany();
+
+    forms.forEach(async (form) => {
+      const types = [
+        {
+          amount: form.glassKgs,
+          type: ResidueType.GLASS,
+          video: form.glassVideoFileName,
+          invoice: form.glassInvoiceFileName,
+        },
+
+        {
+          amount: form.plasticKgs,
+          type: ResidueType.PLASTIC,
+          video: form.plasticVideoFileName,
+          invoice: form.plasticInvoiceFileName,
+        },
+
+        {
+          amount: form.metalKgs,
+          type: ResidueType.METAL,
+          video: form.metalVideoFileName,
+          invoice: form.metalInvoiceFileName,
+        },
+
+        {
+          amount: form.organicKgs,
+          type: ResidueType.ORGANIC,
+          video: form.organicVideoFileName,
+          invoice: form.organicInvoiceFileName,
+        },
+
+        {
+          amount: form.paperKgs,
+          type: ResidueType.PAPER,
+          video: form.paperVideoFileName,
+          invoice: form.paperInvoiceFilename,
+        },
+      ];
+
+      const promises = [];
+
+      types.forEach((residueType) => {
+        if (Number(residueType.amount) && Number(residueType.amount) > 0) {
+          const p = new Promise((resolve) =>
+            resolve(
+              this.prismaService.document.create({
+                data: {
+                  amount: residueType.amount,
+                  formId: form.id,
+                  residueType: residueType.type,
+                  videoFileName: residueType.video,
+                  invoicesFileName: residueType.invoice,
+                },
+              }),
+            ),
+          );
+          promises.push(p);
+        }
+      });
+
+      await Promise.all(promises);
+    });
+
+    return 'ok';
   }
 }

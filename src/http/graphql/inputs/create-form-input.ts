@@ -9,8 +9,8 @@ class ResidueInput {
   @Field({ nullable: true })
   videoFileName?: string;
 
-  @Field({ nullable: true })
-  invoiceFileName?: string;
+  @Field(() => [String])
+  invoicesFileName: string[];
 }
 
 @InputType()

@@ -2,6 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Document {
+  id: ID!
+  residueType: ResidueType!
+  amount: Float!
+  videoFileName: String
+  invoicesFileName: [String!]!
+  form: Form!
+  createdAt: DateTime!
+}
+
+"""Represents the residue type"""
+enum ResidueType {
+  GLASS
+  METAL
+  ORGANIC
+  PAPER
+  PLASTIC
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type User {
   id: ID!
 
@@ -22,11 +46,6 @@ enum ProfileType {
   RECYCLER
   WASTE_GENERATOR
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Form {
   id: ID!
@@ -49,24 +68,8 @@ type Form {
   walletAddress: String
   formMetadataUrl: String
   user: User!
+  documents: [Document!]!
   createdAt: DateTime!
-}
-
-type S3 {
-  videoCreateUrl: String
-  videoFileName: String
-  invoiceCreateUrl: String
-  invoiceFileName: String
-  residue: ResidueType!
-}
-
-"""Represents the residue type"""
-enum ResidueType {
-  GLASS
-  METAL
-  ORGANIC
-  PAPER
-  PLASTIC
 }
 
 type AggregateFormData {
@@ -80,6 +83,14 @@ type AggregateFormData {
 type AggregateFormByUserProfileResponse {
   id: ProfileType!
   data: AggregateFormData!
+}
+
+type S3 {
+  videoCreateUrl: String
+  videoFileName: String
+  invoicesCreateUrl: [String!]!
+  invoicesFileName: [String!]!
+  residue: ResidueType!
 }
 
 type CreateFormResponse {
@@ -114,19 +125,15 @@ type Me {
 }
 
 type Query {
+  documentVideoUrlByResidue(formId: String!, residueType: ResidueType!): String!
+  documentInvoicesUrlByResidue(formId: String!, residueType: ResidueType!): [String!]!
   user(userAuthId: String!): User!
   users: [User!]!
   forms: [Form!]!
   aggregateFormByUserProfile: [AggregateFormByUserProfileResponse!]!
   form(formId: String!): Form!
-  formDocumentsUrlByResidue(formId: String!, residueType: ResidueType!, documentType: DocumentType!): String!
+  test: String!
   me: Me!
-}
-
-"""Represents the document type"""
-enum DocumentType {
-  INVOICE
-  VIDEO
 }
 
 type Mutation {
@@ -135,7 +142,7 @@ type Mutation {
   createForm(data: CreateFormInput!): CreateFormResponse!
   authorizeForm(formId: String!, isFormAuthorized: Boolean!): Form!
   submitFormImage(formId: String!): String!
-  createNFT(formId: String!): SubmitNFTResponse!
+  createFormMetadata(formId: String!): SubmitNFTResponse!
 }
 
 input CreateUserInput {
@@ -164,5 +171,5 @@ input CreateFormInput {
 input ResidueInput {
   amount: Float
   videoFileName: String
-  invoiceFileName: String
+  invoicesFileName: [String!]!
 }
