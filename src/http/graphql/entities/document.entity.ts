@@ -1,5 +1,24 @@
-import { Field, Float, ID, ObjectType } from '@nestjs/graphql';
-import { Form, ResidueType } from './form.entity';
+import {
+  Field,
+  Float,
+  ID,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
+import { Form } from './form.entity';
+
+export enum ResidueType {
+  GLASS = 'GLASS',
+  METAL = 'METAL',
+  ORGANIC = 'ORGANIC',
+  PAPER = 'PAPER',
+  PLASTIC = 'PLASTIC',
+}
+
+registerEnumType(ResidueType, {
+  name: 'ResidueType',
+  description: 'Represents the residue type',
+});
 
 @ObjectType()
 export class Document {

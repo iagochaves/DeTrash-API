@@ -49,26 +49,6 @@ model Form {
 
   document Document[]
 
-  plasticKgs             Decimal @default(0)
-  plasticVideoFileName   String?
-  plasticInvoiceFileName String?
-
-  paperKgs             Decimal @default(0)
-  paperVideoFileName   String?
-  paperInvoiceFilename String?
-
-  metalKgs             Decimal @default(0)
-  metalVideoFileName   String?
-  metalInvoiceFileName String?
-
-  glassKgs             Decimal @default(0)
-  glassVideoFileName   String?
-  glassInvoiceFileName String?
-
-  organicKgs             Decimal @default(0)
-  organicVideoFileName   String?
-  organicInvoiceFileName String?
-
   isFormAuthorizedByAdmin Boolean?
 
   formMetadataUrl String?

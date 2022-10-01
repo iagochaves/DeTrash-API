@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
-import { ResidueType } from 'src/http/graphql/entities/form.entity';
+import { ResidueType } from 'src/http/graphql/entities/document.entity';
 import { ProfileType } from 'src/http/graphql/entities/user.entity';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
 import { getResidueTitle } from 'src/util/getResidueTitle';
@@ -35,19 +35,16 @@ export class FormsService {
   }
 
   listAllForms() {
-    return this.prismaService.form.findMany();
+    return this.prismaService.form.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
-  async listFormDetails() {
-    const [aggregateRecyclerData, aggregateWasteGenData] = await Promise.all([
-      this.prismaService.form.aggregate({
-        _sum: {
-          glassKgs: true,
-          metalKgs: true,
-          organicKgs: true,
-          paperKgs: true,
-          plasticKgs: true,
-        },
+  async aggregateFormByUserProfile() {
+    const [allFormsByRecyclers, allFormsByWasteGenerators] = await Promise.all([
+      this.prismaService.form.findMany({
         where: {
           user: {
             is: {
@@ -56,14 +53,7 @@ export class FormsService {
           },
         },
       }),
-      this.prismaService.form.aggregate({
-        _sum: {
-          glassKgs: true,
-          metalKgs: true,
-          organicKgs: true,
-          paperKgs: true,
-          plasticKgs: true,
-        },
+      this.prismaService.form.findMany({
         where: {
           user: {
             is: {
@@ -74,14 +64,37 @@ export class FormsService {
       }),
     ]);
 
+    const [aggregateRecyclerData, aggregateWasteGenData] = await Promise.all([
+      this.prismaService.document.aggregate({
+        _sum: {
+          amount: true,
+        },
+        where: {
+          OR: allFormsByRecyclers.map((form) => ({
+            formId: form.id,
+          })),
+        },
+      }),
+      this.prismaService.document.aggregate({
+        _sum: {
+          amount: true,
+        },
+        where: {
+          OR: allFormsByWasteGenerators.map((form) => ({
+            formId: form.id,
+          })),
+        },
+      }),
+    ]);
+
     return [
       {
         id: 'RECYCLER',
-        data: aggregateRecyclerData._sum,
+        data: aggregateRecyclerData._sum.amount || 0,
       },
       {
         id: 'WASTE_GENERATOR',
-        data: aggregateWasteGenData._sum,
+        data: aggregateWasteGenData._sum.amount || 0,
       },
     ];
   }
@@ -295,73 +308,5 @@ export class FormsService {
       createMetadataUrl,
       body: JSON.stringify(JsonMetadata, null, 2),
     };
-  }
-
-  async test() {
-    const forms = await this.prismaService.form.findMany();
-
-    forms.forEach(async (form) => {
-      const types = [
-        {
-          amount: form.glassKgs,
-          type: ResidueType.GLASS,
-          video: form.glassVideoFileName,
-          invoice: form.glassInvoiceFileName,
-        },
-
-        {
-          amount: form.plasticKgs,
-          type: ResidueType.PLASTIC,
-          video: form.plasticVideoFileName,
-          invoice: form.plasticInvoiceFileName,
-        },
-
-        {
-          amount: form.metalKgs,
-          type: ResidueType.METAL,
-          video: form.metalVideoFileName,
-          invoice: form.metalInvoiceFileName,
-        },
-
-        {
-          amount: form.organicKgs,
-          type: ResidueType.ORGANIC,
-          video: form.organicVideoFileName,
-          invoice: form.organicInvoiceFileName,
-        },
-
-        {
-          amount: form.paperKgs,
-          type: ResidueType.PAPER,
-          video: form.paperVideoFileName,
-          invoice: form.paperInvoiceFilename,
-        },
-      ];
-
-      const promises = [];
-
-      types.forEach((residueType) => {
-        if (Number(residueType.amount) && Number(residueType.amount) > 0) {
-          const p = new Promise((resolve) =>
-            resolve(
-              this.prismaService.document.create({
-                data: {
-                  amount: residueType.amount,
-                  formId: form.id,
-                  residueType: residueType.type,
-                  videoFileName: residueType.video,
-                  invoicesFileName: residueType.invoice,
-                },
-              }),
-            ),
-          );
-          promises.push(p);
-        }
-      });
-
-      await Promise.all(promises);
-    });
-
-    return 'ok';
   }
 }

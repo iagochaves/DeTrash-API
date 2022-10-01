@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
-import { ResidueType } from 'src/http/graphql/entities/form.entity';
+import { ResidueType } from 'src/http/graphql/entities/document.entity';
 import { S3Service } from './s3.service';
 
 @Injectable()

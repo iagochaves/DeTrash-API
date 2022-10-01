@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { ResidueType } from './form.entity';
+import { ResidueType } from './document.entity';
 
 @ObjectType()
 export class S3 {

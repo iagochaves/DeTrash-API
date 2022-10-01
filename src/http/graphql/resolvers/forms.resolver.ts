@@ -46,7 +46,7 @@ export class FormsResolver {
   @Query(() => [AggregateFormByUserProfileResponse])
   @Roles(Role.Admin)
   aggregateFormByUserProfile() {
-    return this.formsService.listFormDetails();
+    return this.formsService.aggregateFormByUserProfile();
   }
 
   @Query(() => Form)
@@ -82,11 +82,5 @@ export class FormsResolver {
   @Roles(Role.Admin)
   createFormMetadata(@Args('formId') formId: string) {
     return this.formsService.createFormMetadata(formId);
-  }
-
-  @Query(() => String)
-  @Roles(Role.Admin)
-  test() {
-    return this.formsService.test();
   }
 }
