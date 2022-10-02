@@ -57,9 +57,14 @@ enum ProfileType {
   WASTE_GENERATOR
 }
 
+type AggregateFormData {
+  amount: Float!
+  residueType: ResidueType!
+}
+
 type AggregateFormByUserProfileResponse {
   id: ProfileType!
-  data: Float!
+  data: [AggregateFormData!]!
 }
 
 type S3 {

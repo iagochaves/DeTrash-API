@@ -65,7 +65,8 @@ export class FormsService {
     ]);
 
     const [aggregateRecyclerData, aggregateWasteGenData] = await Promise.all([
-      this.prismaService.document.aggregate({
+      this.prismaService.document.groupBy({
+        by: ['residueType'],
         _sum: {
           amount: true,
         },
@@ -75,7 +76,8 @@ export class FormsService {
           })),
         },
       }),
-      this.prismaService.document.aggregate({
+      this.prismaService.document.groupBy({
+        by: ['residueType'],
         _sum: {
           amount: true,
         },
@@ -90,11 +92,21 @@ export class FormsService {
     return [
       {
         id: 'RECYCLER',
-        data: aggregateRecyclerData._sum.amount || 0,
+        data: aggregateRecyclerData.map((data) => {
+          return {
+            amount: data._sum.amount,
+            residueType: data.residueType,
+          };
+        }),
       },
       {
         id: 'WASTE_GENERATOR',
-        data: aggregateWasteGenData._sum.amount || 0,
+        data: aggregateWasteGenData.map((data) => {
+          return {
+            amount: data._sum.amount,
+            residueType: data.residueType,
+          };
+        }),
       },
     ];
   }
