@@ -2,40 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Document {
-  id: ID!
-  residueType: ResidueType!
-  amount: Float!
-  videoFileName: String
-  invoicesFileName: [String!]!
-  form: Form!
-  createdAt: DateTime!
-}
-
-"""Represents the residue type"""
-enum ResidueType {
-  GLASS
-  METAL
-  ORGANIC
-  PAPER
-  PLASTIC
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type Form {
-  id: ID!
-  isFormAuthorizedByAdmin: Boolean
-  walletAddress: String
-  formMetadataUrl: String
-  user: User!
-  documents: [Document!]!
-  createdAt: DateTime!
-}
-
 type User {
   id: ID!
 
@@ -55,6 +21,40 @@ enum ProfileType {
   HODLER
   RECYCLER
   WASTE_GENERATOR
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Form {
+  id: ID!
+  isFormAuthorizedByAdmin: Boolean
+  walletAddress: String
+  formMetadataUrl: String
+  user: User!
+  documents: [Document!]!
+  createdAt: DateTime!
+}
+
+type Document {
+  id: ID!
+  residueType: ResidueType!
+  amount: Float!
+  videoFileName: String
+  invoicesFileName: [String!]!
+  form: Form!
+  createdAt: DateTime!
+}
+
+"""Represents the residue type"""
+enum ResidueType {
+  GLASS
+  METAL
+  ORGANIC
+  PAPER
+  PLASTIC
 }
 
 type AggregateFormData {
@@ -112,6 +112,7 @@ type Query {
   user(userAuthId: String!): User!
   users: [User!]!
   forms: [Form!]!
+  test: String!
   aggregateFormByUserProfile: [AggregateFormByUserProfileResponse!]!
   form(formId: String!): Form!
   me: Me!
