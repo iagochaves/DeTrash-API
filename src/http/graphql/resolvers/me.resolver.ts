@@ -1,9 +1,10 @@
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { AuthUser, CurrentUser } from 'src/http/auth/current-user';
 import { FormsService } from 'src/services/forms.service';
 import { UsersService } from 'src/services/users.service';
 import { Form } from '../entities/form.entity';
 import { User } from '../entities/user.entity';
+import { FormFiltersInput } from '../inputs/form-filters-input';
 import { Me } from '../responses/get-me-response';
 
 @Resolver(() => Me)
@@ -30,7 +31,11 @@ export class MeResolver {
   }
 
   @ResolveField(() => [Form])
-  forms(@Parent() user: User) {
-    return this.formsService.listAllFromUserByUserId(user.id);
+  forms(
+    @Parent() user: User,
+    @Args('filter', { type: () => FormFiltersInput, nullable: true })
+    filter: FormFiltersInput,
+  ) {
+    return this.formsService.listAllFromUserByUserId(user.id, filter);
   }
 }

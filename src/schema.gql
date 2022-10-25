@@ -46,7 +46,7 @@ type User {
   lastLoginDate: DateTime
   email: String!
   phoneNumber: String!
-  forms: [Form!]!
+  forms(filter: FormFiltersInput): [Form!]!
   createdAt: DateTime!
 }
 
@@ -55,6 +55,17 @@ enum ProfileType {
   HODLER
   RECYCLER
   WASTE_GENERATOR
+}
+
+input FormFiltersInput {
+  createdAt: FilterOptions
+}
+
+input FilterOptions {
+  lt: DateTime
+  gt: DateTime
+  lte: DateTime
+  gte: DateTime
 }
 
 type AggregateFormData {
@@ -101,7 +112,7 @@ type Me {
   lastLoginDate: DateTime
   email: String!
   phoneNumber: String!
-  forms: [Form!]!
+  forms(filter: FormFiltersInput): [Form!]!
   createdAt: DateTime!
   permissions: [Permissions!]!
 }
