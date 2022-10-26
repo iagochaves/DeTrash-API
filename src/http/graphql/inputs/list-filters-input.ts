@@ -16,7 +16,7 @@ export class FilterOptions {
 }
 
 @InputType()
-export class FormFiltersInput {
+export class ListFiltersInput {
   @Field(() => FilterOptions, { nullable: true })
   createdAt: FilterOptions;
 }

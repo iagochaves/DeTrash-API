@@ -4,7 +4,7 @@ import { FormsService } from 'src/services/forms.service';
 import { UsersService } from 'src/services/users.service';
 import { Form } from '../entities/form.entity';
 import { User } from '../entities/user.entity';
-import { FormFiltersInput } from '../inputs/form-filters-input';
+import { ListFiltersInput } from '../inputs/list-filters-input';
 import { Me } from '../responses/get-me-response';
 
 @Resolver(() => Me)
@@ -33,8 +33,8 @@ export class MeResolver {
   @ResolveField(() => [Form])
   forms(
     @Parent() user: User,
-    @Args('filter', { type: () => FormFiltersInput, nullable: true })
-    filter: FormFiltersInput,
+    @Args('filter', { type: () => ListFiltersInput, nullable: true })
+    filter: ListFiltersInput,
   ) {
     return this.formsService.listAllFromUserByUserId(user.id, filter);
   }

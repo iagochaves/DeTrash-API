@@ -15,6 +15,7 @@ import { Role } from 'src/util/constants';
 import { Document } from '../entities/document.entity';
 import { Form } from '../entities/form.entity';
 import { CreateFormInput } from '../inputs/create-form-input';
+import { ListFiltersInput } from '../inputs/list-filters-input';
 import { AggregateFormByUserProfileResponse } from '../responses/aggregate-form-by-user-profile-response';
 import { CreateFormResponse } from '../responses/create-form-response';
 import { SubmitNFTResponse } from '../responses/submit-nft-response';
@@ -29,8 +30,11 @@ export class FormsResolver {
 
   @Query(() => [Form])
   @Roles(Role.Admin)
-  async forms() {
-    return this.formsService.listAllForms();
+  async forms(
+    @Args('filter', { type: () => ListFiltersInput, nullable: true })
+    filter: ListFiltersInput,
+  ) {
+    return this.formsService.listAllForms(filter);
   }
 
   @ResolveField()

@@ -14,6 +14,7 @@ import { Role } from 'src/util/constants';
 import { Form } from '../entities/form.entity';
 import { User } from '../entities/user.entity';
 import { CreateUserInput } from '../inputs/create-user-input';
+import { ListFiltersInput } from '../inputs/list-filters-input';
 import { UpdateUserInput } from '../inputs/update-user-input';
 
 @Resolver(() => User)
@@ -31,8 +32,11 @@ export class UsersResolver {
 
   @Query(() => [User])
   @Roles(Role.Admin)
-  users() {
-    return this.usersService.findAll();
+  users(
+    @Args('filter', { type: () => ListFiltersInput, nullable: true })
+    filter: ListFiltersInput,
+  ) {
+    return this.usersService.findAll(filter);
   }
 
   @ResolveField(() => [Form])

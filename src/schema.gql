@@ -46,7 +46,7 @@ type User {
   lastLoginDate: DateTime
   email: String!
   phoneNumber: String!
-  forms(filter: FormFiltersInput): [Form!]!
+  forms(filter: ListFiltersInput): [Form!]!
   createdAt: DateTime!
 }
 
@@ -57,7 +57,7 @@ enum ProfileType {
   WASTE_GENERATOR
 }
 
-input FormFiltersInput {
+input ListFiltersInput {
   createdAt: FilterOptions
 }
 
@@ -112,7 +112,7 @@ type Me {
   lastLoginDate: DateTime
   email: String!
   phoneNumber: String!
-  forms(filter: FormFiltersInput): [Form!]!
+  forms(filter: ListFiltersInput): [Form!]!
   createdAt: DateTime!
   permissions: [Permissions!]!
 }
@@ -121,8 +121,8 @@ type Query {
   documentVideoUrlByResidue(formId: String!, residueType: ResidueType!): String!
   documentInvoicesUrlByResidue(formId: String!, residueType: ResidueType!): [String!]!
   user(userAuthId: String!): User!
-  users: [User!]!
-  forms: [Form!]!
+  users(filter: ListFiltersInput): [User!]!
+  forms(filter: ListFiltersInput): [Form!]!
   aggregateFormByUserProfile: [AggregateFormByUserProfileResponse!]!
   form(formId: String!): Form!
   me: Me!

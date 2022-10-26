@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MessagesHelper } from 'src/helpers/messages.helper';
 import { CreateUserInput } from 'src/http/graphql/inputs/create-user-input';
+import { ListFiltersInput } from 'src/http/graphql/inputs/list-filters-input';
 import { UpdateUserInput } from 'src/http/graphql/inputs/update-user-input';
 
 @Injectable()
@@ -61,8 +62,21 @@ export class UsersService {
     return currentUser;
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  findAll(filters?: ListFiltersInput) {
+    let filterOptions = [];
+
+    if (filters) {
+      filterOptions = Object.entries(filters).map(
+        ([filterKey, filterValue]) => ({
+          [filterKey]: filterValue,
+        }),
+      );
+    }
+    return this.prisma.user.findMany({
+      where: {
+        AND: filterOptions,
+      },
+    });
   }
 
   async findUserByAuthUserId(authUserId: string) {
