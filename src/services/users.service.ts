@@ -8,6 +8,7 @@ import { MessagesHelper } from 'src/helpers/messages.helper';
 import { CreateUserInput } from 'src/http/graphql/inputs/create-user-input';
 import { ListFiltersInput } from 'src/http/graphql/inputs/list-filters-input';
 import { UpdateUserInput } from 'src/http/graphql/inputs/update-user-input';
+import { getFilters } from 'src/util/getFilters';
 
 @Injectable()
 export class UsersService {
@@ -66,12 +67,9 @@ export class UsersService {
     let filterOptions = [];
 
     if (filters) {
-      filterOptions = Object.entries(filters).map(
-        ([filterKey, filterValue]) => ({
-          [filterKey]: filterValue,
-        }),
-      );
+      filterOptions = getFilters(filters);
     }
+
     return this.prisma.user.findMany({
       where: {
         AND: filterOptions,

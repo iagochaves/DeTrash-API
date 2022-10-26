@@ -9,6 +9,7 @@ import { ResidueType } from 'src/http/graphql/entities/document.entity';
 import { ProfileType } from 'src/http/graphql/entities/user.entity';
 import { CreateFormInput } from 'src/http/graphql/inputs/create-form-input';
 import { ListFiltersInput } from 'src/http/graphql/inputs/list-filters-input';
+import { getFilters } from 'src/util/getFilters';
 import { getResidueTitle } from 'src/util/getResidueTitle';
 import { DocumentsService } from './documents.service';
 import { S3Service } from './s3.service';
@@ -39,11 +40,7 @@ export class FormsService {
     let filterOptions = [];
 
     if (filters) {
-      filterOptions = Object.entries(filters).map(
-        ([filterKey, filterValue]) => ({
-          [filterKey]: filterValue,
-        }),
-      );
+      filterOptions = getFilters(filters);
     }
 
     return this.prismaService.form.findMany({
@@ -231,11 +228,7 @@ export class FormsService {
     let filterOptions = [];
 
     if (filters) {
-      filterOptions = Object.entries(filters).map(
-        ([filterKey, filterValue]) => ({
-          [filterKey]: filterValue,
-        }),
-      );
+      filterOptions = getFilters(filters);
     }
 
     return this.prismaService.form.findMany({
